@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<meta name="theme-color" content="#1f6feb">
+<meta name="description" content="Хувийн санхүү, зорилго, амьдралын удирдлагын систем">
+<link rel="manifest" href="manifest.json">
+<!-- Apple touch icon (SVG as data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='30' fill='%231f6feb'/><text x='90' y='125' font-size='90' text-anchor='middle' fill='white'>⬡</text></svg>">
+<title>Life OS Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --bg4: #30363d;
+  --border: #30363d;
+  --border2: #21262d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --accent: #58a6ff;
+  --accent2: #1f6feb;
+  --green: #3fb950;
+  --green2: #238636;
+  --amber: #d29922;
+  --amber2: #bb8009;
+  --red: #f85149;
+  --red2: #da3633;
+  --purple: #bc8cff;
+  --teal: #39d353;
+  --card-radius: 12px;
+  --btn-radius: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); font-family:'DM Sans',sans-serif; color:var(--text); min-height:100vh; min-height:100dvh; padding-bottom:env(safe-area-inset-bottom); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg2); }
+::-webkit-scrollbar-thumb { background:var(--bg4); border-radius:3px; }
+
+/* LAYOUT */
+.app { display:flex; height:100vh; height:100dvh; overflow:hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width:220px; min-width:220px; background:var(--bg2);
+  border-right:1px solid var(--border); display:flex;
+  flex-direction:column; overflow-y:auto; transition:width 0.2s;
+}
+.sidebar.collapsed { width:56px; min-width:56px; }
+.sidebar-header { padding:20px 16px 12px; display:flex; align-items:center; gap:10px; }
+.logo-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--accent2),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.logo-text { font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; }
+.logo-text span { color:var(--accent); }
+.life-score-pill {
+  margin:0 12px 16px; background:linear-gradient(135deg,rgba(31,111,235,0.2),rgba(188,140,255,0.15));
+  border:1px solid rgba(88,166,255,0.3); border-radius:30px;
+  padding:8px 12px; text-align:center;
+}
+.life-score-pill .lsp-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+.life-score-pill .lsp-val { font-size:22px; font-weight:700; color:var(--accent); }
+.nav-section { padding:8px 0; }
+.nav-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; padding:4px 16px 8px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:8px 16px;
+  cursor:pointer; border-radius:0; transition:background 0.15s;
+  font-size:13px; color:var(--text2); white-space:nowrap; overflow:hidden;
+  border-left:2px solid transparent;
+}
+.nav-item:hover { background:var(--bg3); color:var(--text); }
+.nav-item.active { background:rgba(88,166,255,0.1); color:var(--accent); border-left-color:var(--accent); }
+.nav-icon { width:16px; flex-shrink:0; text-align:center; }
+
+/* MAIN */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.topbar {
+  height:56px; background:var(--bg2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px; flex-shrink:0;
+}
+.page-title { font-size:16px; font-weight:600; }
+.topbar-right { display:flex; align-items:center; gap:12px; }
+.badge { background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:12px; color:var(--text2); }
+.badge.green { background:rgba(63,185,80,0.1); border-color:rgba(63,185,80,0.3); color:var(--green); }
+.badge.amber { background:rgba(210,153,34,0.1); border-color:rgba(210,153,34,0.3); color:var(--amber); }
+.badge.red { background:rgba(248,81,73,0.1); border-color:rgba(248,81,73,0.3); color:var(--red); }
+
+.content { flex:1; overflow-y:auto; padding:24px; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* CARDS */
+.card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--card-radius); padding:20px; margin-bottom:16px;
+}
+.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.card-title { font-size:14px; font-weight:600; color:var(--text); }
+.card-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+
+.grid-2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.grid-4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+
+/* STAT CARDS */
+.stat-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--card-radius); padding:16px; position:relative; overflow:hidden;
+}
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat-card.blue::before { background:linear-gradient(90deg,var(--accent2),var(--accent)); }
+.stat-card.green::before { background:linear-gradient(90deg,var(--green2),var(--green)); }
+.stat-card.amber::before { background:linear-gradient(90deg,var(--amber2),var(--amber)); }
+.stat-card.purple::before { background:linear-gradient(90deg,#8957e5,var(--purple)); }
+.stat-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.stat-val { font-size:24px; font-weight:700; }
+.stat-val.blue { color:var(--accent); }
+.stat-val.green { color:var(--green); }
+.stat-val.amber { color:var(--amber); }
+.stat-val.purple { color:var(--purple); }
+.stat-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+
+/* FORMS */
+.form-row { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-bottom:16px; }
+.form-group { flex:1; min-width:120px; }
+.form-group label { display:block; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; font-weight:500; }
+input[type=text], input[type=number], input[type=url], input[type=date], select, textarea {
+  width:100%; background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--btn-radius); padding:8px 12px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:13px;
+  transition:border-color 0.15s; outline:none;
+}
+input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+select option { background:var(--bg3); }
+
+/* BUTTONS */
+.btn {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--accent2); color:white; border:none;
+  border-radius:var(--btn-radius); padding:8px 16px;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+  cursor:pointer; transition:opacity 0.15s, transform 0.1s;
+}
+.btn:hover { opacity:0.9; }
+.btn:active { transform:scale(0.98); }
+.btn.outline { background:transparent; border:1px solid var(--border); color:var(--text2); }
+.btn.outline:hover { border-color:var(--text2); color:var(--text); }
+.btn.sm { padding:5px 10px; font-size:11px; }
+.btn.danger { background:rgba(248,81,73,0.15); color:var(--red); border:1px solid rgba(248,81,73,0.3); }
+.btn.success { background:var(--green2); }
+.btn.ghost { background:transparent; color:var(--text3); border:none; padding:4px 6px; }
+.btn.ghost:hover { color:var(--text); background:var(--bg3); }
+
+/* PROGRESS */
+.progress { background:var(--bg4); border-radius:20px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 0.5s; }
+.progress-fill.green { background:linear-gradient(90deg,var(--green2),var(--green)); }
+.progress-fill.amber { background:linear-gradient(90deg,var(--amber2),var(--amber)); }
+.progress-fill.red { background:linear-gradient(90deg,var(--red2),var(--red)); }
+
+/* INSIGHT */
+.insight {
+  background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.2);
+  border-radius:var(--btn-radius); padding:12px 16px; font-size:13px;
+  color:var(--text2); line-height:1.6; margin-top:12px;
+}
+.insight.success { background:rgba(63,185,80,0.05); border-color:rgba(63,185,80,0.2); }
+.insight.warn { background:rgba(210,153,34,0.05); border-color:rgba(210,153,34,0.2); }
+
+/* GTD */
+.gtd-board { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.gtd-col { background:var(--bg3); border:1px solid var(--border); border-radius:var(--card-radius); padding:14px; min-height:200px; }
+.gtd-col-title { font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.gtd-item {
+  background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+  padding:8px 10px; margin-bottom:8px; font-size:12px; color:var(--text);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.gtd-item-text { flex:1; }
+
+/* CRM */
+.crm-card {
+  background:var(--bg3); border:1px solid var(--border); border-radius:var(--card-radius);
+  padding:14px; display:flex; align-items:center; gap:12px; margin-bottom:8px;
+}
+.crm-avatar {
+  width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--purple));
+  display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; flex-shrink:0;
+}
+.crm-info { flex:1; }
+.crm-name { font-size:13px; font-weight:500; }
+.crm-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+
+/* VISION */
+.vision-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+.vision-card {
+  background:var(--bg3); border:1px solid var(--border); border-radius:var(--card-radius);
+  overflow:hidden; cursor:pointer; transition:transform 0.2s, border-color 0.2s;
+}
+.vision-card:hover { transform:translateY(-2px); border-color:var(--accent); }
+.vision-img { width:100%; height:120px; object-fit:cover; }
+.vision-title { padding:10px; font-size:12px; font-weight:500; color:var(--text); }
+
+/* KPI */
+.kpi-item { background:var(--bg3); border:1px solid var(--border); border-radius:var(--card-radius); padding:14px; margin-bottom:8px; }
+.kpi-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.kpi-name { font-size:13px; font-weight:500; }
+.kpi-pct { font-size:13px; font-weight:700; }
+
+/* RISK */
+.risk-item { background:var(--bg3); border:1px solid var(--border); border-radius:var(--card-radius); padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.risk-score { font-family:'DM Mono',monospace; font-size:13px; padding:3px 10px; border-radius:20px; }
+.risk-score.low { background:rgba(63,185,80,0.15); color:var(--green); }
+.risk-score.med { background:rgba(210,153,34,0.15); color:var(--amber); }
+.risk-score.high { background:rgba(248,81,73,0.15); color:var(--red); }
+
+/* CANVAS */
+.canvas-section { margin-bottom:12px; }
+.canvas-label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.canvas-section textarea { border-radius:8px; min-height:70px; resize:vertical; }
+
+/* AI CHAT */
+.ai-messages { max-height:400px; overflow-y:auto; margin-bottom:16px; }
+.ai-msg { padding:12px 14px; border-radius:var(--card-radius); margin-bottom:10px; font-size:13px; line-height:1.65; }
+.ai-msg.user { background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); margin-left:20px; }
+.ai-msg.assistant { background:var(--bg3); border:1px solid var(--border); margin-right:20px; }
+.ai-msg.thinking { color:var(--text3); font-style:italic; }
+.ai-input-area { display:flex; gap:10px; }
+.ai-input-area input { flex:1; }
+.ai-quick-prompts { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.quick-btn { background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; cursor:pointer; color:var(--text2); transition:all 0.15s; white-space:nowrap; }
+.quick-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(88,166,255,0.05); }
+
+/* DIVIDER */
+.divider { border:none; border-top:1px solid var(--border); margin:16px 0; }
+
+/* INVEST TABLE */
+.inv-row { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.inv-name { flex:1; font-size:13px; font-weight:500; min-width:100px; }
+.inv-amount { font-family:'DM Mono',monospace; font-size:13px; color:var(--text2); }
+.inv-roi { font-size:12px; padding:2px 8px; border-radius:20px; }
+.inv-roi.pos { background:rgba(63,185,80,0.15); color:var(--green); }
+.inv-roi.neg { background:rgba(248,81,73,0.15); color:var(--red); }
+
+/* WEEK YEAR */
+.week-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:4px; margin:16px 0; }
+.week-cell { aspect-ratio:1; border-radius:4px; background:var(--bg4); cursor:pointer; border:1px solid transparent; transition:all 0.1s; }
+.week-cell:hover { border-color:var(--accent); }
+.week-cell.done { background:rgba(63,185,80,0.5); }
+.week-cell.active { background:var(--accent2); border-color:var(--accent); }
+
+/* NET WORTH */
+.nw-section { display:flex; flex-direction:column; gap:8px; }
+.nw-row { display:flex; align-items:center; gap:10px; }
+.nw-row label { flex:1; font-size:12px; color:var(--text3); }
+.nw-row input { max-width:180px; }
+
+/* CHART WRAPPER */
+.chart-wrap { position:relative; height:220px; margin:16px 0; }
+
+/* REVIEW */
+.review-section { margin-bottom:16px; }
+.review-section .section-label { font-size:12px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.review-section textarea { min-height:80px; resize:vertical; }
+
+/* TABS WITHIN PAGE */
+.inline-tabs { display:flex; gap:4px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.inline-tab { padding:6px 14px; font-size:12px; font-weight:500; border-radius:6px 6px 0 0; cursor:pointer; color:var(--text3); background:transparent; border:none; }
+.inline-tab.active { color:var(--accent); background:rgba(88,166,255,0.1); }
+
+/* MOBILE BOTTOM NAV */
+.bottom-nav {
+  display:none;
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--bg2); border-top:1px solid var(--border);
+  z-index:1000;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bottom-nav-inner {
+  display:flex; justify-content:space-around; align-items:center;
+  height:56px;
+}
+.bnav-item {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  cursor:pointer; padding:6px 8px; flex:1;
+  color:var(--text3); font-size:10px; border:none; background:none;
+  transition:color 0.15s; -webkit-tap-highlight-color:transparent;
+}
+.bnav-item i { font-size:17px; }
+.bnav-item.active { color:var(--accent); }
+.bnav-more-menu {
+  position:fixed; bottom:calc(56px + env(safe-area-inset-bottom));
+  left:0; right:0;
+  background:var(--bg2); border-top:1px solid var(--border);
+  z-index:999; padding:10px;
+  display:none;
+}
+.bnav-more-menu.open { display:block; }
+.bnav-more-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.bnav-more-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  cursor:pointer; padding:10px 6px; border-radius:8px;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text2); font-size:10px; text-align:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.bnav-more-item i { font-size:16px; color:var(--accent); }
+.bnav-more-item.active { border-color:var(--accent); color:var(--accent); }
+
+@media(max-width:768px) {
+  .sidebar { display:none; }
+  .bottom-nav { display:block; }
+  .content { padding:12px; padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
+  .topbar { padding:0 14px; height:48px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
+  .form-row { flex-direction:column; }
+  .form-group { min-width:unset; }
+  .stat-val { font-size:20px; }
+  input[type=number], input[type=text], select, textarea { font-size:16px !important; }
+}
+
+/* SCROLLBAR FOR CONTENT */
+.content::-webkit-scrollbar { width:5px; }
+
+/* ANIMATION */
+.page.active { animation:fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* MOSCOW ITEMS */
+.moscow-item { display:flex; align-items:center; margin-bottom:6px; }
+.moscow-item input[type=text], .moscow-item input[type=number] { padding:6px 10px; font-size:12px; }
+
+/* JOURNAL */
+.tx-row {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px; margin-bottom:6px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.tx-type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.tx-type-dot.income { background:var(--green); }
+.tx-type-dot.expense { background:var(--red); }
+.tx-type-dot.opportunity { background:var(--purple); }
+.tx-type-dot.saving { background:var(--accent); }
+.tx-amount { font-family:'DM Mono',monospace; font-size:13px; font-weight:600; min-width:110px; }
+.tx-amount.income { color:var(--green); }
+.tx-amount.expense { color:var(--red); }
+.tx-amount.opportunity { color:var(--purple); }
+.tx-amount.saving { color:var(--accent); }
+.tx-desc { flex:1; font-size:13px; color:var(--text); min-width:120px; }
+.tx-meta { font-size:11px; color:var(--text3); white-space:nowrap; }
+.tx-tag { font-size:10px; background:var(--bg4); border:1px solid var(--border); border-radius:20px; padding:2px 8px; color:var(--text3); }
+.journal-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:16px; }
+.js-box { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:14px 16px; text-align:center; }
+.js-box .js-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.js-box .js-val { font-size:20px; font-weight:700; }
+.filter-bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.filter-btn { background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:11px; cursor:pointer; color:var(--text3); transition:all 0.15s; }
+.filter-btn:hover, .filter-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(88,166,255,0.08); }
+.filter-btn.income.active { border-color:var(--green); color:var(--green); background:rgba(63,185,80,0.08); }
+.filter-btn.expense.active { border-color:var(--red); color:var(--red); background:rgba(248,81,73,0.08); }
+.filter-btn.opportunity.active { border-color:var(--purple); color:var(--purple); background:rgba(188,140,255,0.08); }
+.filter-btn.saving.active { border-color:var(--accent); color:var(--accent); }
+.honesty-bar { margin:12px 0; }
+.honesty-label { font-size:11px; color:var(--text3); margin-bottom:6px; display:flex; justify-content:space-between; }
+.empty-journal { text-align:center; padding:48px 20px; color:var(--text3); font-size:13px; }
+.empty-journal i { font-size:32px; margin-bottom:12px; display:block; opacity:0.3; }
+
+/* TYPING */
+.typing-dot { display:inline-block; width:6px; height:6px; background:var(--text3); border-radius:50%; animation:blink 1.2s infinite; margin:0 2px; }
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon"><i class="fas fa-cube"></i></div>
+      <div class="logo-text">Life <span>OS</span> Pro</div>
+    </div>
+    <div class="life-score-pill">
+      <div class="lsp-label">Life Score</div>
+      <div class="lsp-val" id="sidebarScore">0%</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ерөнхий</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span><span>Dashboard</span></div>
+      <div class="nav-item" data-page="ai"><span class="nav-icon"><i class="fas fa-robot"></i></span><span>AI Coach</span></div>
+      <div class="nav-item" data-page="healthscore"><span class="nav-icon"><i class="fas fa-star"></i></span><span>Санхүүгийн Оноо</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Санхүү</div>
+      <div class="nav-item" data-page="finance"><span class="nav-icon"><i class="fas fa-coins"></i></span><span>Санхүү</span></div>
+      <div class="nav-item" data-page="networth"><span class="nav-icon"><i class="fas fa-balance-scale"></i></span><span>Net Worth</span></div>
+      <div class="nav-item" data-page="invest"><span class="nav-icon"><i class="fas fa-chart-line"></i></span><span>Хөрөнгө</span></div>
+      <div class="nav-item" data-page="emergency"><span class="nav-icon"><i class="fas fa-shield-alt"></i></span><span>Нөөц сан</span></div>
+      <div class="nav-item" data-page="freedomday"><span class="nav-icon"><i class="fas fa-flag"></i></span><span>Эрх чөлөөний өдөр</span></div>
+      <div class="nav-item" data-page="dti"><span class="nav-icon"><i class="fas fa-percentage"></i></span><span>DTI Харьцаа</span></div>
+      <div class="nav-item" data-page="billcalendar"><span class="nav-icon"><i class="fas fa-calendar-alt"></i></span><span>Төлбөрийн календарь</span></div>
+      <div class="nav-item" data-page="sideincome"><span class="nav-icon"><i class="fas fa-briefcase"></i></span><span>Нэмэлт орлого</span></div>
+      <div class="nav-item" data-page="journal"><span class="nav-icon"><i class="fas fa-book"></i></span><span>Дэвтэр</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Зорилго</div>
+      <div class="nav-item" data-page="gtd"><span class="nav-icon"><i class="fas fa-inbox"></i></span><span>GTD</span></div>
+      <div class="nav-item" data-page="year12"><span class="nav-icon"><i class="fas fa-calendar-check"></i></span><span>12 Week</span></div>
+      <div class="nav-item" data-page="kpi"><span class="nav-icon"><i class="fas fa-bullseye"></i></span><span>KPI</span></div>
+      <div class="nav-item" data-page="risk"><span class="nav-icon"><i class="fas fa-exclamation-triangle"></i></span><span>Эрсдэл</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Бусад</div>
+      <div class="nav-item" data-page="crm"><span class="nav-icon"><i class="fas fa-users"></i></span><span>CRM</span></div>
+      <div class="nav-item" data-page="vision"><span class="nav-icon"><i class="fas fa-eye"></i></span><span>Vision Board</span></div>
+      <div class="nav-item" data-page="business"><span class="nav-icon"><i class="fas fa-th-large"></i></span><span>Business Canvas</span></div>
+      <div class="nav-item" data-page="review"><span class="nav-icon"><i class="fas fa-book-open"></i></span><span>Жилийн үнэлгээ</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn ghost" id="sidebarToggle" style="font-size:16px"><i class="fas fa-bars"></i></button>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge" id="dateDisplay"></span>
+        <span class="badge green" id="topScore">Score: 0%</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="grid-4" style="margin-bottom:16px">
+          <div class="stat-card blue">
+            <div class="stat-label">Net Worth</div>
+            <div class="stat-val blue" id="dashNW">0 ₮</div>
+            <div class="stat-sub">Хөрөнгө - өр</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Нөөц сан</div>
+            <div class="stat-val green" id="dashEmergency">0%</div>
+            <div class="stat-sub">6 сарын зорилт</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-label">12 Week Score</div>
+            <div class="stat-val amber" id="dashWeek">0%</div>
+            <div class="stat-sub" id="dashWeekGoal">Зорилго тавьна уу</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">Нийт хөрөнгө</div>
+            <div class="stat-val purple" id="dashInvest">0 ₮</div>
+            <div class="stat-sub">ROI дундаж: <span id="dashROI">0</span>%</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar" style="color:var(--accent);margin-right:8px"></i>Орлогын бүтэц (Pareto)</div></div>
+            <div class="chart-wrap"><canvas id="chartPareto"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-spider" style="color:var(--purple);margin-right:8px"></i>Амьдралын KPI</div></div>
+            <div class="chart-wrap"><canvas id="chartKpi"></canvas></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-tasks" style="color:var(--green);margin-right:8px"></i>Өнөөдрийн ажлууд</div></div>
+            <div id="dashTasks" style="font-size:13px;color:var(--text2)">GTD хэсэгт ажил нэмнэ үү</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-robot" style="color:var(--amber);margin-right:8px"></i>AI Хурдан зөвлөмж</div></div>
+            <div id="dashAiTip" class="insight">AI Coach хэсгийг нээгээд дүн шинжилгээ авна уу...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-exclamation-triangle" style="color:var(--red);margin-right:8px"></i>Өндөр эрсдэлүүд</div></div>
+          <div id="dashRisks" style="font-size:13px;color:var(--text2)">Одоогоор эрсдэл бүртгэгдээгүй байна</div>
+        </div>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="page" id="page-finance">
+        <!-- Row 1: Income + Key Ratios -->
+        <div class="grid-2" style="margin-bottom:0">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">💼 Орлогын бүтэц</div><div class="card-sub">Сарын бодит орлого бүрийг нэг бүрчлэн бич</div></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>Үндсэн ажил (₮)</label><input type="number" id="jobIncome" value="1500000"></div>
+              <div class="form-group"><label>Freelance / Хөлс (₮)</label><input type="number" id="freeIncome" value="0"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Бизнес орлого (₮)</label><input type="number" id="bizIncome" value="0"></div>
+              <div class="form-group"><label>Хөрөнгийн өгөөш (₮)</label><input type="number" id="investIncome" value="0"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Тэтгэмж / Бусад (₮)</label><input type="number" id="otherIncome" value="0"></div>
+              <div class="form-group"><label>Одоогийн орлого (₮/сар)</label><input type="number" id="smartIncome" value="1500000" style="border-color:var(--green)"></div>
+            </div>
+            <button class="btn" style="width:100%" id="calcPareto"><i class="fas fa-sync-alt"></i> Орлого шинэчлэх</button>
+            <div id="paretoResult"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">📐 Санхүүгийн үндсэн үзүүлэлтүүд</div><div class="card-sub">Savings Rate · Debt Ratio · Cash Flow</div></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+              <div class="js-box">
+                <div class="js-label">Savings Rate</div>
+                <div class="js-val" id="ratioSavings" style="color:var(--green)">0%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px">Зорилт ≥ 20%</div>
+              </div>
+              <div class="js-box">
+                <div class="js-label">Debt Ratio</div>
+                <div class="js-val" id="ratioDebt" style="color:var(--amber)">0%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px">Аюулгүй ≤ 36%</div>
+              </div>
+              <div class="js-box">
+                <div class="js-label">Cash Flow</div>
+                <div class="js-val" id="ratioCashflow" style="color:var(--accent)">0 ₮</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px">Орлого − Зардал</div>
+              </div>
+              <div class="js-box">
+                <div class="js-label">Зарцуулалтын %</div>
+                <div class="js-val" id="ratioSpend" style="color:var(--text2)">0%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px">Орлогын хэдэн %</div>
+              </div>
+            </div>
+            <div class="form-group"><label>Сарын хуримтлал / хадгаламж (₮)</label><input type="number" id="monthlySaving" value="300000" oninput="calcRatios()"></div>
+            <div class="form-group" style="margin-top:10px"><label>Сарын зээлийн төлбөр нийт (₮)</label><input type="number" id="monthlyDebt" value="200000" oninput="calcRatios()"></div>
+            <div id="ratioInsight" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: MoSCoW detailed -->
+        <div class="card" style="margin-top:16px">
+          <div class="card-header"><div><div class="card-title">💰 MoSCoW Төсөв — Нэг бүрчлэн бичих</div><div class="card-sub">Өөрийгөө хуурахгүй — бодит зардал бүрийг тэмдэглэ</div></div></div>
+          <div class="grid-2">
+            <!-- Must Have -->
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:16px">🔴</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--red)">Must Have — Заавал байх ёстой</div>
+                  <div style="font-size:11px;color:var(--text3)">Амьдрал хэвийн үргэлжлэхэд зайлшгүй</div>
+                </div>
+              </div>
+              <div id="mustItems">
+                <div class="moscow-item" data-cat="must"><input type="text" placeholder="Жишээ: Түрээс" class="moscow-name" style="width:55%"><input type="number" placeholder="₮" class="moscow-amt" style="width:35%;margin-left:6px"><button class="btn ghost sm moscow-del" style="margin-left:4px"><i class="fas fa-times" style="color:var(--red)"></i></button></div>
+              </div>
+              <button class="btn outline sm" onclick="addMoscowRow('must')" style="margin-top:6px;width:100%"><i class="fas fa-plus"></i> Мөр нэмэх</button>
+              <div style="margin-top:10px;padding:10px;background:rgba(248,81,73,0.07);border-radius:8px;border:1px solid rgba(248,81,73,0.2)">
+                <span style="font-size:11px;color:var(--text3)">Must нийт:</span>
+                <span style="font-size:16px;font-weight:700;color:var(--red);margin-left:8px" id="mustTotal">0 ₮</span>
+              </div>
+            </div>
+            <!-- Should Have -->
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:16px">🟠</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--amber)">Should Have — Байвал сайн</div>
+                  <div style="font-size:11px;color:var(--text3)">Шаардлагатай ч түр хойшлуулж болно</div>
+                </div>
+              </div>
+              <div id="shouldItems">
+                <div class="moscow-item" data-cat="should"><input type="text" placeholder="Жишээ: Сургалт" class="moscow-name" style="width:55%"><input type="number" placeholder="₮" class="moscow-amt" style="width:35%;margin-left:6px"><button class="btn ghost sm moscow-del" style="margin-left:4px"><i class="fas fa-times" style="color:var(--red)"></i></button></div>
+              </div>
+              <button class="btn outline sm" onclick="addMoscowRow('should')" style="margin-top:6px;width:100%"><i class="fas fa-plus"></i> Мөр нэмэх</button>
+              <div style="margin-top:10px;padding:10px;background:rgba(210,153,34,0.07);border-radius:8px;border:1px solid rgba(210,153,34,0.2)">
+                <span style="font-size:11px;color:var(--text3)">Should нийт:</span>
+                <span style="font-size:16px;font-weight:700;color:var(--amber);margin-left:8px" id="shouldTotal">0 ₮</span>
+              </div>
+            </div>
+            <!-- Could Have -->
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:16px">🟢</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--green)">Could Have — Боломжтой бол</div>
+                  <div style="font-size:11px;color:var(--text3)">Амьдралын чанар нэмэгдүүлэх</div>
+                </div>
+              </div>
+              <div id="couldItems">
+                <div class="moscow-item" data-cat="could"><input type="text" placeholder="Жишээ: Кафе" class="moscow-name" style="width:55%"><input type="number" placeholder="₮" class="moscow-amt" style="width:35%;margin-left:6px"><button class="btn ghost sm moscow-del" style="margin-left:4px"><i class="fas fa-times" style="color:var(--red)"></i></button></div>
+              </div>
+              <button class="btn outline sm" onclick="addMoscowRow('could')" style="margin-top:6px;width:100%"><i class="fas fa-plus"></i> Мөр нэмэх</button>
+              <div style="margin-top:10px;padding:10px;background:rgba(63,185,80,0.07);border-radius:8px;border:1px solid rgba(63,185,80,0.2)">
+                <span style="font-size:11px;color:var(--text3)">Could нийт:</span>
+                <span style="font-size:16px;font-weight:700;color:var(--green);margin-left:8px" id="couldTotal">0 ₮</span>
+              </div>
+            </div>
+            <!-- Won't Have -->
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:16px">⚪</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text3)">Won't Have — Одоохондоо үгүй</div>
+                  <div style="font-size:11px;color:var(--text3)">Зорилгод нийцэхгүй, хойшлуулна</div>
+                </div>
+              </div>
+              <div id="wontItems">
+                <div class="moscow-item" data-cat="wont"><input type="text" placeholder="Жишээ: Шинэ утас" class="moscow-name" style="width:55%"><input type="number" placeholder="₮" class="moscow-amt" style="width:35%;margin-left:6px"><button class="btn ghost sm moscow-del" style="margin-left:4px"><i class="fas fa-times" style="color:var(--red)"></i></button></div>
+              </div>
+              <button class="btn outline sm" onclick="addMoscowRow('wont')" style="margin-top:6px;width:100%"><i class="fas fa-plus"></i> Мөр нэмэх</button>
+              <div style="margin-top:10px;padding:10px;background:rgba(110,118,129,0.07);border-radius:8px;border:1px solid rgba(110,118,129,0.2)">
+                <span style="font-size:11px;color:var(--text3)">Won't нийт:</span>
+                <span style="font-size:16px;font-weight:700;color:var(--text3);margin-left:8px" id="wontTotal">0 ₮</span>
+              </div>
+            </div>
+          </div>
+          <hr class="divider">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+              <div><span style="font-size:12px;color:var(--text3)">Нийт зардал:</span> <span style="font-size:18px;font-weight:700;color:var(--red)" id="moscowGrandTotal">0 ₮</span></div>
+              <div><span style="font-size:12px;color:var(--text3)">Үлдэгдэл:</span> <span style="font-size:18px;font-weight:700" id="moscowBalance" style="color:var(--green)">0 ₮</span></div>
+            </div>
+            <button class="btn" onclick="calcMoscow()"><i class="fas fa-calculator"></i> Тооцоолох</button>
+          </div>
+          <div id="moscowSummary" style="margin-top:12px"></div>
+        </div>
+
+        <!-- Row 3: 3 budget methods side by side -->
+        <div class="grid-3" style="margin-top:0">
+          <!-- 50/30/20 -->
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">⚖️ 50/30/20 Дүрэм</div><div class="card-sub">Тэнцвэртэй төсвийн суурь</div></div></div>
+            <div id="rule503020">
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--red)">🏠 Хэрэгцээ (50%)</span><span id="r50val" style="font-weight:600">750,000 ₮</span></div>
+                <div class="progress"><div class="progress-fill" id="r50bar" style="width:0%;background:linear-gradient(90deg,var(--red2),var(--red))"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px">Таны зарцуулалт: <span id="r50actual">0 ₮</span></div>
+              </div>
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--accent)">🎯 Хүсэл (30%)</span><span id="r30val" style="font-weight:600">450,000 ₮</span></div>
+                <div class="progress"><div class="progress-fill" id="r30bar" style="width:0%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px">Таны зарцуулалт: <span id="r30actual">0 ₮</span></div>
+              </div>
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--green)">💚 Хуримтлал (20%)</span><span id="r20val" style="font-weight:600">300,000 ₮</span></div>
+                <div class="progress"><div class="progress-fill green" id="r20bar" style="width:0%"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px">Таны хуримтлал: <span id="r20actual">0 ₮</span></div>
+              </div>
+            </div>
+            <button class="btn outline sm" style="width:100%" onclick="calc503020()"><i class="fas fa-sync-alt"></i> Шинэчлэх</button>
+            <div id="result503020" style="margin-top:10px"></div>
+          </div>
+          <!-- Zero-Based Budget -->
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">🎯 Zero-Based Budget</div><div class="card-sub">Орлого = Зардал + Хуримтлал</div></div></div>
+            <div style="text-align:center;margin-bottom:14px">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Хуваарилагдаагүй үлдэгдэл</div>
+              <div id="zbbRemain" style="font-size:36px;font-weight:700;color:var(--green)">0 ₮</div>
+              <div id="zbbStatus" style="font-size:12px;color:var(--text3);margin-top:4px">Орлого оруулж тооцоолно уу</div>
+            </div>
+            <div style="background:var(--bg4);border-radius:8px;padding:12px;font-size:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text3)">Нийт орлого</span><span id="zbbIncome" style="color:var(--green);font-weight:600">0 ₮</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text3)">Must зардал</span><span id="zbbMust" style="color:var(--red)">0 ₮</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text3)">Should зардал</span><span id="zbbShould" style="color:var(--amber)">0 ₮</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text3)">Could зардал</span><span id="zbbCould" style="color:var(--green)">0 ₮</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text3)">Хуримтлал</span><span id="zbbSav" style="color:var(--accent)">0 ₮</span></div>
+              <hr style="border-color:var(--border);margin:6px 0">
+              <div style="display:flex;justify-content:space-between;font-weight:600"><span>Үлдэгдэл</span><span id="zbbFinal" style="color:var(--green)">0 ₮</span></div>
+            </div>
+            <button class="btn outline sm" style="width:100%;margin-top:10px" onclick="calcZBB()"><i class="fas fa-equals"></i> Тэнцүүлэх</button>
+          </div>
+          <!-- FIRE Calculator -->
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">🔥 FIRE Тооцоолол</div><div class="card-sub">Санхүүгийн эрх чөлөө — хэдэн жил?</div></div></div>
+            <div class="form-group"><label>Жилийн зардал (₮)</label><input type="number" id="fireAnnual" value="14400000" oninput="calcFIRE()"></div>
+            <div class="form-group" style="margin-top:8px"><label>Одоогийн хуримтлал (₮)</label><input type="number" id="fireCurrentSav" value="1000000" oninput="calcFIRE()"></div>
+            <div class="form-group" style="margin-top:8px"><label>Сарын хадгаламж (₮)</label><input type="number" id="fireMonthly" value="300000" oninput="calcFIRE()"></div>
+            <div class="form-group" style="margin-top:8px"><label>Хүлээгдэх өгөөш % (жилд)</label><input type="number" id="fireReturn" value="7" oninput="calcFIRE()"></div>
+            <div style="margin-top:12px;background:var(--bg4);border-radius:8px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">FIRE тоо (25x жилийн зардал)</div>
+              <div id="fireNumber" style="font-size:22px;font-weight:700;color:var(--purple)">360,000,000 ₮</div>
+              <div style="font-size:11px;color:var(--text3);margin:8px 0 4px">Хэдэн жилд хүрэх вэ?</div>
+              <div id="fireYears" style="font-size:28px;font-weight:700;color:var(--amber)">— жил</div>
+              <div id="fireAge" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
+            </div>
+            <div class="form-group" style="margin-top:10px"><label>Одоогийн нас</label><input type="number" id="fireAge2" value="28" oninput="calcFIRE()" style="max-width:100px"></div>
+          </div>
+        </div>
+
+        <!-- Row 4: Cash Flow Forecast + SMART goal -->
+        <div class="grid-2" style="margin-top:0">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">📅 Cash Flow Forecast — 6 сар</div><div class="card-sub">Ирэх 6 сарын мөнгөн урсгалын таамаглал</div></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>Нэмэлт орлого өсөлт % (сард)</label><input type="number" id="cfGrowth" value="0" placeholder="0"></div>
+              <div class="form-group"><label>Нэмэлт зардал өөрчлөлт % (сард)</label><input type="number" id="cfExpGrowth" value="0" placeholder="0"></div>
+              <button class="btn sm" onclick="calcCashFlow()"><i class="fas fa-chart-area"></i> Таамаглах</button>
+            </div>
+            <div id="cashFlowTable" style="font-size:12px"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">🎯 SMART Орлогын зорилго</div><div class="card-sub">Тодорхой, хэмжигдэхүйц зорилго</div></div></div>
+            <div class="form-group"><label>Зорилтот орлого (₮/сар)</label><input type="number" id="smartTarget" value="3000000"></div>
+            <div class="form-group" style="margin-top:10px"><label>Хугацаа (сар)</label><input type="number" id="smartMonths" value="12"></div>
+            <button class="btn" style="margin-top:12px;width:100%" id="calcSmart"><i class="fas fa-calculator"></i> Тооцоолох</button>
+            <div id="smartResult"></div>
+            <hr class="divider">
+            <div class="form-group"><label>Хуримтлалын зорилго (₮)</label><input type="number" id="goalSavTarget" value="10000000"></div>
+            <div class="form-group" style="margin-top:8px"><label>Одоогийн хуримтлал (₮)</label><input type="number" id="goalSavCurrent" value="1000000" oninput="calcGoalProgress()"></div>
+            <div style="margin-top:10px"><div id="goalProgressBar" class="progress" style="height:10px;margin-bottom:6px"><div class="progress-fill green" id="goalFill" style="width:0%"></div></div>
+            <div id="goalProgressText" style="font-size:12px;color:var(--text3)">—</div></div>
+          </div>
+        </div>
+
+        <!-- Hidden inputs for backward compat -->
+        <input type="hidden" id="mustCost" value="800000">
+        <input type="hidden" id="shouldCost" value="250000">
+        <input type="hidden" id="couldCost" value="150000">
+        <input type="hidden" id="wontCost" value="0">
+      </div>
+
+      <!-- NET WORTH -->
+      <div class="page" id="page-networth">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title" style="color:var(--green)"><i class="fas fa-plus-circle" style="margin-right:8px"></i>Хөрөнгө (Assets)</div></div>
+            <div class="nw-section">
+              <div class="nw-row"><label>Бэлэн мөнгө</label><input type="number" id="assetCash" value="500000"></div>
+              <div class="nw-row"><label>Хадгаламж</label><input type="number" id="assetSave" value="1000000"></div>
+              <div class="nw-row"><label>Машин</label><input type="number" id="assetCar" value="0"></div>
+              <div class="nw-row"><label>Үл хөдлөх</label><input type="number" id="assetProperty" value="5000000"></div>
+              <div class="nw-row"><label>Хөрөнгө оруулалт</label><input type="number" id="assetInvest" value="0"></div>
+              <div class="nw-row"><label>Бусад</label><input type="number" id="assetOther" value="0"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title" style="color:var(--red)"><i class="fas fa-minus-circle" style="margin-right:8px"></i>Өр төлбөр (Liabilities)</div></div>
+            <div class="nw-section">
+              <div class="nw-row"><label>Банкны зээл</label><input type="number" id="liabilityLoan" value="2500000"></div>
+              <div class="nw-row"><label>Зээлийн карт</label><input type="number" id="liabilityCard" value="0"></div>
+              <div class="nw-row"><label>Хувь хүний зээл</label><input type="number" id="liabilityPersonal" value="0"></div>
+              <div class="nw-row"><label>Бусад өр</label><input type="number" id="liabilityOther" value="0"></div>
+            </div>
+            <hr class="divider">
+            <button class="btn success" style="width:100%" id="calcNetWorth"><i class="fas fa-calculator"></i> Net Worth тооцоолох</button>
+            <div id="networthResult" style="text-align:center;margin-top:16px">
+              <div class="stat-label">Цэвэр хөрөнгө</div>
+              <div id="nwValue" class="stat-val green" style="font-size:32px">0 ₮</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Хөрөнгийн бүтэц</div></div>
+          <div class="chart-wrap" style="height:200px"><canvas id="chartNetWorth"></canvas></div>
+        </div>
+      </div>
+
+      <!-- INVEST -->
+      <div class="page" id="page-invest">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title"><i class="fas fa-chart-line" style="color:var(--green);margin-right:8px"></i>Хөрөнгө оруулалт</div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Төрөл</label><input type="text" id="investName" placeholder="ETF, Алт, Крипто..."></div>
+            <div class="form-group"><label>Дүн (₮)</label><input type="number" id="investAmount" placeholder="500000"></div>
+            <div class="form-group"><label>ROI %</label><input type="number" id="investROI" placeholder="12"></div>
+            <div class="form-group"><label>Сектор</label><select id="investSector"><option>Хувьцаа</option><option>Бонд</option><option>Үл хөдлөх</option><option>Крипто</option><option>Алт</option><option>Бусад</option></select></div>
+            <button class="btn" id="addInvest"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+          <div id="investList"></div>
+          <div id="investTotal" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- EMERGENCY -->
+      <div class="page" id="page-emergency">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-shield-alt" style="color:var(--accent);margin-right:8px"></i>Нөөц сан тооцоолол</div></div>
+            <div class="form-group"><label>Сарын зайлшгүй зардал (₮)</label><input type="number" id="monthlyExpense" value="1050000"></div>
+            <div class="form-group" style="margin-top:10px"><label>Одоогийн хадгаламж (₮)</label><input type="number" id="currentSavings" value="0"></div>
+            <div class="form-group" style="margin-top:10px"><label>Зорилт</label>
+              <select id="emergencyTarget">
+                <option value="3">3 сар (минимум)</option>
+                <option value="6" selected>6 сар (зөвлөмж)</option>
+                <option value="9">9 сар</option>
+                <option value="12">12 сар (хамгийн найдвартай)</option>
+              </select>
+            </div>
+            <button class="btn" style="margin-top:12px;width:100%" id="updateEmergency"><i class="fas fa-calculator"></i> Тооцоолох</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Нөөц сангийн прогресс</div></div>
+            <div id="emergencyDetail" style="font-size:13px;color:var(--text2);margin-bottom:16px">Зүүн талд мэдээллийг оруулаарай</div>
+            <div class="progress" style="height:12px;margin-bottom:12px"><div id="emergencyFillDetail" class="progress-fill green" style="width:0%"></div></div>
+            <div id="emergencyChart" style="text-align:center">
+              <div style="font-size:48px;font-weight:700;color:var(--green)" id="emergencyPct">0%</div>
+              <div style="font-size:13px;color:var(--text3)" id="emergencyMonths">— сар бүрэхгүй байна</div>
+            </div>
+            <div id="emergencyInsight"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JOURNAL -->
+      <div class="page" id="page-journal">
+        <div class="journal-summary" id="journalSummary">
+          <div class="js-box"><div class="js-label">Нийт орлого</div><div class="js-val" id="jsTotalIncome" style="color:var(--green)">0 ₮</div></div>
+          <div class="js-box"><div class="js-label">Нийт зардал</div><div class="js-val" id="jsTotalExpense" style="color:var(--red)">0 ₮</div></div>
+          <div class="js-box"><div class="js-label">Хуримтлал</div><div class="js-val" id="jsTotalSaving" style="color:var(--accent)">0 ₮</div></div>
+          <div class="js-box"><div class="js-label">Боломж</div><div class="js-val" id="jsTotalOpp" style="color:var(--purple)">0 ₮</div></div>
+          <div class="js-box"><div class="js-label">Цэвэр урсгал</div><div class="js-val" id="jsNetFlow">0 ₮</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-plus" style="color:var(--green);margin-right:8px"></i>Шинэ бүртгэл нэмэх</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="min-width:130px;max-width:160px">
+              <label>Төрөл</label>
+              <select id="txType">
+                <option value="income">💚 Орлого</option>
+                <option value="expense">🔴 Зардал</option>
+                <option value="saving">💙 Хуримтлал</option>
+                <option value="opportunity">🟣 Боломж</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Тайлбар</label>
+              <input type="text" id="txDesc" placeholder="Юуны төлөө / хаанаас...">
+            </div>
+            <div class="form-group" style="min-width:130px;max-width:160px">
+              <label>Дүн (₮)</label>
+              <input type="number" id="txAmount" placeholder="50000">
+            </div>
+            <div class="form-group" style="min-width:130px;max-width:160px">
+              <label>Ангилал</label>
+              <select id="txCat">
+                <option>Хоол</option><option>Тээвэр</option><option>Түрээс</option><option>Цалин</option>
+                <option>Freelance</option><option>Фитнесс</option><option>Кафе</option><option>Шоппинг</option>
+                <option>Эрүүл мэнд</option><option>Сургалт</option><option>Хадгаламж</option><option>Зээл</option>
+                <option>Бизнес</option><option>Хөрөнгө оруулалт</option><option>Бусад</option>
+              </select>
+            </div>
+            <div class="form-group" style="min-width:120px;max-width:140px">
+              <label>Огноо</label>
+              <input type="date" id="txDate">
+            </div>
+            <div class="form-group" style="min-width:100px;max-width:120px">
+              <label>Шошго</label>
+              <input type="text" id="txTag" placeholder="#хэрэгтэй">
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button class="btn" id="addTx"><i class="fas fa-plus"></i> Нэмэх</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-list" style="color:var(--accent);margin-right:8px"></i>Бүртгэлийн түүх</div>
+            <div style="display:flex;gap:6px">
+              <select id="txFilterMonth" style="font-size:12px;padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2)" onchange="renderJournal()">
+                <option value="">Бүх сар</option>
+              </select>
+              <button class="btn danger sm" onclick="if(confirm('Бүх бүртгэл устгах уу?')){D.journal=[];save();renderJournal();}"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-btn active" onclick="setTxFilter('all',this)">Бүгд</div>
+            <div class="filter-btn income" onclick="setTxFilter('income',this)">💚 Орлого</div>
+            <div class="filter-btn expense" onclick="setTxFilter('expense',this)">🔴 Зардал</div>
+            <div class="filter-btn saving" onclick="setTxFilter('saving',this)">💙 Хуримтлал</div>
+            <div class="filter-btn opportunity" onclick="setTxFilter('opportunity',this)">🟣 Боломж</div>
+          </div>
+          <div id="txList"></div>
+        </div>
+      </div>
+
+      <!-- GTD -->
+      <div class="page" id="page-gtd">
+        <div class="card" style="margin-bottom:16px">
+          <div class="form-row">
+            <input type="text" id="newInbox" placeholder="Шинэ ажил оруулах..." style="flex:1">
+            <select id="gtdPriority"><option value="normal">Энгийн</option><option value="high">Яаралтай</option><option value="someday">Someday</option></select>
+            <button class="btn" id="addInbox"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+        </div>
+        <div class="gtd-board">
+          <div class="gtd-col">
+            <div class="gtd-col-title"><i class="fas fa-inbox" style="color:var(--accent)"></i> Inbox <span id="gtdInboxCount" class="badge" style="margin-left:4px">0</span></div>
+            <div id="gtdInbox"></div>
+          </div>
+          <div class="gtd-col">
+            <div class="gtd-col-title"><i class="fas fa-bolt" style="color:var(--amber)"></i> Next Action</div>
+            <div id="gtdNext"></div>
+          </div>
+          <div class="gtd-col">
+            <div class="gtd-col-title"><i class="fas fa-clock" style="color:var(--purple)"></i> Waiting For</div>
+            <div id="gtdWaiting"></div>
+          </div>
+          <div class="gtd-col">
+            <div class="gtd-col-title"><i class="fas fa-cloud" style="color:var(--text3)"></i> Someday/Maybe</div>
+            <div id="gtdSomeday"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div class="page" id="page-crm">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-user-plus" style="color:var(--accent);margin-right:8px"></i>Шинэ харилцагч нэмэх</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Нэр</label><input type="text" id="crmName" placeholder="Бат Болд"></div>
+            <div class="form-group"><label>Төрөл</label>
+              <select id="crmType"><option>Найз</option><option>Гэр бүл</option><option>Бизнес</option><option>Ментор</option><option>Хамтрагч</option></select>
+            </div>
+            <div class="form-group"><label>Утасны дугаар</label><input type="text" id="crmPhone" placeholder="9911xxxx"></div>
+            <div class="form-group"><label>Төрсөн өдөр</label><input type="date" id="crmBirthday"></div>
+            <div class="form-group"><label>Сүүлд уулзсан</label><input type="date" id="crmLastMeet"></div>
+            <button class="btn" id="addCrm"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+        </div>
+        <div id="crmList"></div>
+      </div>
+
+      <!-- VISION -->
+      <div class="page" id="page-vision">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">Шинэ мөрөөдөл нэмэх</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Гарчиг</label><input type="text" id="visionTitle" placeholder="Миний мөрөөдлийн байшин"></div>
+            <div class="form-group"><label>Ангилал</label>
+              <select id="visionCat"><option>Амьдрал</option><option>Карьер</option><option>Аялал</option><option>Эрүүл мэнд</option><option>Санхүү</option><option>Харилцаа</option></select>
+            </div>
+            <div class="form-group"><label>Зурагны URL</label><input type="url" id="visionUrl" placeholder="https://..."></div>
+            <div class="form-group"><label>Зорилтот он</label><input type="number" id="visionYear" placeholder="2027" min="2025" max="2040"></div>
+            <button class="btn" id="addVision"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+        </div>
+        <div id="visionList" class="vision-grid"></div>
+      </div>
+
+      <!-- 12 WEEK YEAR -->
+      <div class="page" id="page-year12">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-calendar-check" style="color:var(--amber);margin-right:8px"></i>12 Долоо хоногийн зорилго</div></div>
+            <div class="form-group"><label>Гол зорилго</label><input type="text" id="weekGoal" placeholder="Жишээ: 3 сая орлого олох"></div>
+            <div class="form-group" style="margin-top:10px"><label>Эхлэх өдөр</label><input type="date" id="weekStart"></div>
+            <div class="form-group" style="margin-top:10px"><label>Энэ долоо хоногийн гүйцэтгэл (%)</label><input type="number" id="weekScoreInput" value="0" min="0" max="100"></div>
+            <button class="btn" style="margin-top:12px;width:100%" id="updateWeekScore"><i class="fas fa-save"></i> Хадгалах</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">12 Долоо хоногийн урсгал</div></div>
+            <div class="week-grid" id="weekGrid"></div>
+            <div id="weekDisplay" class="insight" style="margin-top:0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <div class="page" id="page-kpi">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-bullseye" style="color:var(--red);margin-right:8px"></i>KPI Scorecard нэмэх</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>KPI нэр</label><input type="text" id="kpiName" placeholder="Сарын орлого"></div>
+            <div class="form-group"><label>Ангилал</label>
+              <select id="kpiCategory"><option>Санхүү</option><option>Эрүүл мэнд</option><option>Карьер</option><option>Харилцаа</option><option>Хувийн хөгжил</option></select>
+            </div>
+            <div class="form-group"><label>Зорилт</label><input type="number" id="kpiTarget" placeholder="3000000"></div>
+            <div class="form-group"><label>Одоогийн утга</label><input type="number" id="kpiCurrent" placeholder="1500000"></div>
+            <div class="form-group"><label>Нэгж</label><input type="text" id="kpiUnit" placeholder="₮, кг, цаг..."></div>
+            <button class="btn" id="addKpi"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+        </div>
+        <div id="kpiList"></div>
+      </div>
+
+      <!-- RISK -->
+      <div class="page" id="page-risk">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-exclamation-triangle" style="color:var(--amber);margin-right:8px"></i>Эрсдэл бүртгэх</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Эрсдэлийн нэр</label><input type="text" id="riskName" placeholder="Ажлаа алдах"></div>
+            <div class="form-group"><label>Ангилал</label>
+              <select id="riskCategory"><option>Санхүү</option><option>Эрүүл мэнд</option><option>Карьер</option><option>Хувийн</option><option>Бизнес</option></select>
+            </div>
+            <div class="form-group"><label>Магадлал (1-10)</label><input type="number" id="riskProb" placeholder="3" min="1" max="10"></div>
+            <div class="form-group"><label>Нөлөө (1-10)</label><input type="number" id="riskImpact" placeholder="8" min="1" max="10"></div>
+            <div class="form-group"><label>Урьдчилан сэргийлэх арга</label><input type="text" id="riskMitigation" placeholder="Даатгал авах..."></div>
+            <button class="btn" id="addRisk"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+        </div>
+        <div id="riskList"></div>
+        <div id="riskAnalysis"></div>
+      </div>
+
+      <!-- BUSINESS CANVAS -->
+      <div class="page" id="page-business">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-th-large" style="color:var(--purple);margin-right:8px"></i>Business Model Canvas</div>
+          <button class="btn sm" id="saveCanvas"><i class="fas fa-save"></i> Хадгалах</button></div>
+          <div class="grid-3">
+            <div class="canvas-section"><div class="canvas-label">Customer Segments</div><textarea id="canvas1" placeholder="Хэн байна вэ?"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Value Propositions</div><textarea id="canvas2" placeholder="Ямар үнэ цэнэ?"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Channels</div><textarea id="canvas3" placeholder="Яаж хүргэх вэ?"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Customer Relationships</div><textarea id="canvas4" placeholder="Яаж харилцах вэ?"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Revenue Streams</div><textarea id="canvas5" placeholder="Орлогын эх үүсвэр"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Key Resources</div><textarea id="canvas6" placeholder="Гол нөөц баялаг"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Key Activities</div><textarea id="canvas7" placeholder="Гол үйл ажиллагаа"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Key Partners</div><textarea id="canvas8" placeholder="Гол түнш"></textarea></div>
+            <div class="canvas-section"><div class="canvas-label">Cost Structure</div><textarea id="canvas9" placeholder="Зардлын бүтэц"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNUAL REVIEW -->
+      <div class="page" id="page-review">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-book-open" style="color:var(--purple);margin-right:8px"></i>Жилийн үнэлгээ</div>
+          <button class="btn sm success" id="saveReview"><i class="fas fa-save"></i> Хадгалах</button></div>
+          <div class="grid-2">
+            <div class="review-section"><div class="section-label">✅ Юу амжив?</div><textarea id="reviewWins" placeholder="Жилийн хамгийн том амжилтуудаа бич..."></textarea></div>
+            <div class="review-section"><div class="section-label">❌ Юу бүтэлгүйтэв?</div><textarea id="reviewFails" placeholder="Биелэгдээгүй зорилго, алдаа..."></textarea></div>
+            <div class="review-section"><div class="section-label">📚 Юу сурав?</div><textarea id="reviewLearn" placeholder="Жилийн хамгийн чухал сургамж..."></textarea></div>
+            <div class="review-section"><div class="section-label">🚀 Дараа жилийн зорилго</div><textarea id="reviewNext" placeholder="TOP 3 зорилго..."></textarea></div>
+            <div class="review-section"><div class="section-label">🙏 Талархал</div><textarea id="reviewGratitude" placeholder="Талархалтай зүйлс..."></textarea></div>
+            <div class="review-section"><div class="section-label">⚡ Нэг үгэнд жилийг илэрхийлвэл</div><textarea id="reviewWord" rows="2" placeholder="Өсөлт, тэмцэл, аялал..."></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI COACH -->
+      <div class="page" id="page-ai">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title"><i class="fas fa-robot" style="color:var(--accent);margin-right:8px"></i>AI Life Coach</div><div class="card-sub">Anthropic Claude — Таны хувийн санхүүгийн зөвлөгч</div></div></div>
+          <div class="ai-quick-prompts">
+            <div class="quick-btn" onclick="sendQuick('Миний санхүүгийн байдалд дүн шинжилгээ хий')">📊 Санхүүгийн дүн шинжилгээ</div>
+            <div class="quick-btn" onclick="sendQuick('Орлогоо нэмэгдүүлэх 5 арга зам')">💡 Орлого нэмэгдүүлэх</div>
+            <div class="quick-btn" onclick="sendQuick('Хэрхэн зардлаа бууруулах вэ?')">✂️ Зардал багасгах</div>
+            <div class="quick-btn" onclick="sendQuick('Хөрөнгө оруулалтын зөвлөгөө өг')">📈 Хөрөнгө оруулалт</div>
+            <div class="quick-btn" onclick="sendQuick('Life Score-оо яаж нэмэгдүүлэх вэ?')">⭐ Score нэмэгдүүлэх</div>
+            <div class="quick-btn" onclick="sendQuick('Нөөц сан хуримтлуулах стратеги')">🛡️ Нөөц сан</div>
+          </div>
+          <div class="ai-messages" id="aiMessages">
+            <div class="ai-msg assistant">Сайн байна уу! Би таны AI Life Coach. Таны санхүү, зорилго, амьдралын чанарыг сайжруулахад туслах бэлэн байна. Дээрх товчлуурууд дээр дарж эсвэл өөрийн асуулт бичнэ үү. 🚀</div>
+          </div>
+          <div class="ai-input-area">
+            <input type="text" id="aiInput" placeholder="Асуулт бичнэ үү...">
+            <button class="btn" id="aiSend"><i class="fas fa-paper-plane"></i> Илгээх</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCIAL HEALTH SCORE PAGE -->
+      <div class="page" id="page-healthscore">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">🏆 Санхүүгийн Эрүүл Мэндийн Оноо</div><div class="card-sub">Таны санхүүгийн нийт байдлын үнэлгээ</div></div></div>
+          <div style="text-align:center;padding:20px 0">
+            <div id="healthScoreCircle" style="width:140px;height:140px;border-radius:50%;border:8px solid var(--bg4);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;">
+              <div id="healthScoreVal" style="font-size:42px;font-weight:800;color:var(--green)">0</div>
+              <div style="font-size:11px;color:var(--text3)">/100 оноо</div>
+            </div>
+            <div id="healthScoreGrade" style="font-size:20px;font-weight:700;margin-bottom:4px">—</div>
+            <div id="healthScoreMsg" style="font-size:13px;color:var(--text2)">Мэдээллийн хэсэгт утгуудаа оруулна уу</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">📋 Үнэлгээний шалгуурууд</div>
+            <div id="healthCriteria" style="font-size:13px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">💡 Сайжруулах зөвлөмжүүд</div>
+            <div id="healthAdvice" style="font-size:13px;color:var(--text2);line-height:1.8"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">📊 Оноон дэлгэрэнгүй</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="chartHealth"></canvas></div>
+        </div>
+        <div style="text-align:center;margin-top:8px">
+          <button class="btn" onclick="calcHealthScore()"><i class="fas fa-sync-alt"></i> Оноо шинэчлэх</button>
+        </div>
+      </div>
+
+      <!-- FREEDOM DAY PAGE -->
+      <div class="page" id="page-freedomday">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">🎯 Санхүүгийн Эрх Чөлөөний Өдөр</div><div class="card-sub">Хөдөлмөрийнхөө хэдэн хувийг өөртөө зориулж байна вэ?</div></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="form-group"><label>Жилийн нийт орлого (₮)</label><input type="number" id="fdAnnualIncome" value="18000000" oninput="calcFreedomDay()"></div>
+            <div class="form-group"><label>Жилийн нийт татвар + НДШ (₮)</label><input type="number" id="fdTax" value="2160000" oninput="calcFreedomDay()"></div>
+            <div class="form-group"><label>Жилийн нийт зардал (₮)</label><input type="number" id="fdExpenses" value="14400000" oninput="calcFreedomDay()"></div>
+            <div class="form-group"><label>Жилийн хадгаламж (₮)</label><input type="number" id="fdSavings" value="1440000" oninput="calcFreedomDay()"></div>
+          </div>
+          <div style="text-align:center;padding:20px;background:var(--bg3);border-radius:12px;margin-bottom:14px">
+            <div style="font-size:13px;color:var(--text3);margin-bottom:8px">Санхүүгийн эрх чөлөөний өдөр</div>
+            <div id="freedomDate" style="font-size:32px;font-weight:800;color:var(--accent)">— сарын — өдөр</div>
+            <div id="freedomDayNum" style="font-size:14px;color:var(--text2);margin-top:6px">Жилийн — өдөр</div>
+          </div>
+          <div id="freedomTimeline" style="margin-bottom:14px"></div>
+          <div class="chart-wrap" style="height:200px"><canvas id="chartFreedomDay"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">📖 Эрх чөлөөний өдөр гэж юу вэ?</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7">
+            Жилийн эхнээс ажиллаж байгаа хугацаандаа орсон мөнгөнөөс <strong style="color:var(--red)">татвар + НДШ</strong> болон <strong style="color:var(--amber)">нийт зардал</strong> хасагдсан дараа <strong style="color:var(--green)">жинхэнэ өөртөө</strong> ажиллаж эхлэх өдрийг <em>Санхүүгийн Эрх Чөлөөний Өдөр</em> гэнэ. Тэр өдрөөс жилийн эцэс хүртэл бол таны хадгаламж, хөрөнгийн цаг.
+          </div>
+          <div id="freedomInsight" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- DTI PAGE -->
+      <div class="page" id="page-dti">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">💳 Өр/Орлогын Харьцаа (DTI)</div><div class="card-sub">Debt-to-Income Ratio — Санхүүгийн дарамтын хэмжүүр</div></div></div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div>
+              <div class="form-group" style="margin-bottom:10px"><label>Сарын нийт орлого (₮)</label><input type="number" id="dtiIncome" value="1500000" oninput="calcDTI()"></div>
+              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">Сарын зээлийн төлбөрүүд:</div>
+              <div id="dtiItems">
+                <div class="dti-item" style="display:flex;gap:8px;margin-bottom:8px">
+                  <input type="text" placeholder="Орон сууцны зээл" class="dti-name" style="flex:1">
+                  <input type="number" placeholder="₮" class="dti-amt" style="width:120px">
+                  <button class="btn ghost sm" onclick="this.parentElement.remove();calcDTI()"><i class="fas fa-times" style="color:var(--red)"></i></button>
+                </div>
+              </div>
+              <button class="btn outline sm" onclick="addDTIRow()" style="width:100%;margin-top:6px"><i class="fas fa-plus"></i> Зээл нэмэх</button>
+            </div>
+            <div>
+              <div style="text-align:center;padding:24px;background:var(--bg3);border-radius:12px;margin-bottom:12px">
+                <div style="font-size:12px;color:var(--text3);margin-bottom:6px">DTI Харьцаа</div>
+                <div id="dtiValue" style="font-size:52px;font-weight:800;color:var(--green)">0%</div>
+                <div id="dtiStatus" style="font-size:13px;font-weight:600;margin-top:4px">—</div>
+              </div>
+              <div id="dtiGauge" style="margin-bottom:12px">
+                <div style="font-size:11px;color:var(--text3);display:flex;justify-content:space-between;margin-bottom:4px"><span>0%</span><span>36%</span><span>50%+</span></div>
+                <div style="position:relative;height:16px;background:linear-gradient(90deg,var(--green),var(--amber) 50%,var(--red));border-radius:20px;overflow:hidden">
+                  <div id="dtiNeedle" style="position:absolute;top:0;bottom:0;width:3px;background:white;border-radius:2px;transition:left 0.5s;left:0"></div>
+                </div>
+              </div>
+              <div id="dtiDetail" style="font-size:12px;color:var(--text2)"></div>
+            </div>
+          </div>
+          <div id="dtiAdvice"></div>
+          <div class="chart-wrap" style="height:200px;margin-top:14px"><canvas id="chartDTI"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">📋 DTI Стандарт</div>
+          <div style="font-size:13px;line-height:2">
+            <div><span style="color:var(--green)">●</span> <strong>0–20%</strong> — Маш сайн. Зээлийн дарамт бага, хөрөнгө оруулалт хийх боломжтой.</div>
+            <div><span style="color:var(--accent)">●</span> <strong>20–36%</strong> — Хэвийн. Банкны стандарт хязгаар. Шинэ зээл авахад боломжтой.</div>
+            <div><span style="color:var(--amber)">●</span> <strong>36–43%</strong> — Анхааруулга. Ипотек авахад хэцүү болж магадгүй.</div>
+            <div><span style="color:var(--red)">●</span> <strong>43%+</strong> — Аюулгүй бус. Зээлийн дарамт хэт их, яаралтай бууруулах хэрэгтэй.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILL CALENDAR PAGE -->
+      <div class="page" id="page-billcalendar">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">📅 Сарын Төлбөрийн Календарь</div><div class="card-sub">Бүх төлбөрүүдийн хуваарь</div></div>
+            <button class="btn sm" onclick="addBillRow()"><i class="fas fa-plus"></i> Нэмэх</button>
+          </div>
+          <div id="billItems" style="margin-bottom:14px"></div>
+          <div class="form-row" id="billAddForm" style="display:none;background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:14px">
+            <div class="form-group"><label>Нэр</label><input type="text" id="billName" placeholder="Жишээ: Түрээс"></div>
+            <div class="form-group"><label>Дүн (₮)</label><input type="number" id="billAmt" placeholder="300000"></div>
+            <div class="form-group"><label>Сарын өдөр</label><input type="number" id="billDay" placeholder="1-31" min="1" max="31"></div>
+            <div class="form-group"><label>Төрөл</label>
+              <select id="billCat">
+                <option value="housing">🏠 Орон сууц</option>
+                <option value="utilities">💡 Коммунал</option>
+                <option value="loan">💳 Зээл</option>
+                <option value="subscription">📱 Захиалга</option>
+                <option value="insurance">🛡️ Даатгал</option>
+                <option value="other">📦 Бусад</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end">
+              <button class="btn success sm" onclick="saveBill()"><i class="fas fa-check"></i> Хадгалах</button>
+              <button class="btn outline sm" onclick="document.getElementById('billAddForm').style.display='none'">Болих</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">🗓️ Энэ сарын хуваарь</div>
+          <div id="billCalendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:11px"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="card-title">📊 Сарын нийт дүн</div>
+            <div id="billTotal" style="font-size:18px;font-weight:700;color:var(--red)">0 ₮</div>
+          </div>
+          <div id="billCatBreakdown"></div>
+        </div>
+      </div>
+
+      <!-- SIDE INCOME PLANNER PAGE -->
+      <div class="page" id="page-sideincome">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">💼 Нэмэлт Орлогын Төлөвлөгч</div><div class="card-sub">Нэмэлт орлогын эх үүсвэр төлөвлөх, хянах</div></div></div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="form-group"><label>Үндсэн орлого (₮/сар)</label><input type="number" id="siMainIncome" value="1500000" oninput="calcSideIncome()"></div>
+            <div class="form-group"><label>Нэмэлт орлогын зорилт (₮/сар)</label><input type="number" id="siTarget" value="500000" oninput="calcSideIncome()"></div>
+          </div>
+          <div id="sideIncomeItems" style="margin-bottom:12px"></div>
+          <button class="btn outline sm" onclick="addSideIncomeRow()" style="width:100%"><i class="fas fa-plus"></i> Нэмэлт орлогын эх үүсвэр нэмэх</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">📊 Орлогын харьцуулалт</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="js-box">
+              <div class="js-label">Нэмэлт орлого нийт</div>
+              <div class="js-val green" id="siTotal">0 ₮</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px">Сарын зорилт: <span id="siTargetShow">0 ₮</span></div>
+            </div>
+            <div class="js-box">
+              <div class="js-label">Нийт орлого</div>
+              <div class="js-val blue" id="siCombined">0 ₮</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px">Нэмэлт <span id="siPercent">0</span>% нэмэгдлээ</div>
+            </div>
+          </div>
+          <div style="margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Зорилтын биелэлт</span><span id="siProgress">0%</span></div>
+            <div class="progress"><div class="progress-fill green" id="siProgressBar" style="width:0%"></div></div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="chartSideIncome"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">💡 Нэмэлт орлогын санаанууд</div>
+          <div class="grid-2" style="font-size:12px;color:var(--text2)">
+            <div style="padding:10px;background:var(--bg3);border-radius:8px"><strong style="color:var(--accent)">🖥️ Онлайн</strong><br>Freelance, Дизайн, Орчуулга, Онлайн сургалт</div>
+            <div style="padding:10px;background:var(--bg3);border-radius:8px"><strong style="color:var(--green)">🏪 Бизнес</strong><br>Жижиг бизнес, Худалдаа, Гар урлал</div>
+            <div style="padding:10px;background:var(--bg3);border-radius:8px"><strong style="color:var(--amber)">📦 Хөрөнгө</strong><br>Түрээс, Ногдол ашиг, P2P зээл</div>
+            <div style="padding:10px;background:var(--bg3);border-radius:8px"><strong style="color:var(--purple)">🎓 Ур чадвар</strong><br>Зөвлөх, Сургалт, Консультант</div>
+          </div>
+        </div>
+      </div>
+
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" data-page="dashboard" onclick="navTo('dashboard')">
+      <i class="fas fa-chart-pie"></i><span>Нүүр</span>
+    </button>
+    <button class="bnav-item" data-page="finance" onclick="navTo('finance')">
+      <i class="fas fa-coins"></i><span>Санхүү</span>
+    </button>
+    <button class="bnav-item" data-page="healthscore" onclick="navTo('healthscore')">
+      <i class="fas fa-star"></i><span>Оноо</span>
+    </button>
+    <button class="bnav-item" data-page="ai" onclick="navTo('ai')">
+      <i class="fas fa-robot"></i><span>AI</span>
+    </button>
+    <button class="bnav-item" id="bnavMore" onclick="toggleMoreMenu()">
+      <i class="fas fa-grid-2"></i><span>Бусад</span>
+    </button>
+  </div>
+</nav>
+<div class="bnav-more-menu" id="bnavMoreMenu">
+  <div class="bnav-more-grid">
+    <div class="bnav-more-item" onclick="navTo('emergency');toggleMoreMenu()"><i class="fas fa-shield-alt"></i>Нөөц сан</div>
+    <div class="bnav-more-item" onclick="navTo('freedomday');toggleMoreMenu()"><i class="fas fa-flag"></i>Эрх чөлөө</div>
+    <div class="bnav-more-item" onclick="navTo('dti');toggleMoreMenu()"><i class="fas fa-percentage"></i>DTI</div>
+    <div class="bnav-more-item" onclick="navTo('billcalendar');toggleMoreMenu()"><i class="fas fa-calendar-alt"></i>Календарь</div>
+    <div class="bnav-more-item" onclick="navTo('sideincome');toggleMoreMenu()"><i class="fas fa-briefcase"></i>Нэмэлт</div>
+    <div class="bnav-more-item" onclick="navTo('invest');toggleMoreMenu()"><i class="fas fa-chart-line"></i>Хөрөнгө</div>
+    <div class="bnav-more-item" onclick="navTo('gtd');toggleMoreMenu()"><i class="fas fa-inbox"></i>GTD</div>
+    <div class="bnav-more-item" onclick="navTo('networth');toggleMoreMenu()"><i class="fas fa-balance-scale"></i>Net Worth</div>
+    <div class="bnav-more-item" onclick="navTo('journal');toggleMoreMenu()"><i class="fas fa-book"></i>Дэвтэр</div>
+    <div class="bnav-more-item" onclick="navTo('kpi');toggleMoreMenu()"><i class="fas fa-bullseye"></i>KPI</div>
+    <div class="bnav-more-item" onclick="navTo('year12');toggleMoreMenu()"><i class="fas fa-calendar-check"></i>12 Week</div>
+    <div class="bnav-more-item" onclick="navTo('risk');toggleMoreMenu()"><i class="fas fa-exclamation-triangle"></i>Эрсдэл</div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+let D = {
+  gtd: { inbox:["Санхүүгийн тайлан гаргах"], next:[], waiting:[], someday:[] },
+  crm: [{name:"Бат",type:"Найз",phone:"9900xxxx",birthday:"1990-01-15",lastMeet:"2025-12-01"}],
+  vision: [{title:"Далайн эрэг аялал",url:"https://picsum.photos/400/300?random=1",cat:"Аялал",year:2026}],
+  investments: [{name:"ETF",amount:500000,roi:12,sector:"Хувьцаа"}],
+  kpis: [{name:"Орлого",category:"Санхүү",target:3000000,current:1500000,unit:"₮"},{name:"Биеийн дасгал",category:"Эрүүл мэнд",target:20,current:8,unit:"удаа"}],
+  risks: [{name:"Ажлаа алдах",category:"Карьер",prob:3,impact:8,mitigation:"Нөөц сан байгуулах"}],
+  canvas:{cs:'',vp:'',ch:'',cr:'',rev:'',kr:'',ka:'',kp:'',cost:''},
+  annualReview:{wins:'',fails:'',learn:'',next:'',gratitude:'',word:''},
+  weekGoal:"3 сая орлого", weekScore:45, weekStart:'',
+  journal: [],
+};
+let charts = {};
+function save() { try{localStorage.setItem('life_os_v3',JSON.stringify(D));}catch(e){} }
+function load() {
+  try { let s=localStorage.getItem('life_os_v3'); if(s) D=JSON.parse(s); } catch(e){}
+  renderAll();
+}
+
+// ============ NAV ============
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.addEventListener('click',()=>{
+    navTo(n.dataset.page);
+  });
+});
+document.getElementById('sidebarToggle').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('collapsed');
+});
+document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('mn-MN',{year:'numeric',month:'short',day:'numeric'});
+
+// ============ UTILS ============
+function fmt(n){ return Math.round(n).toLocaleString('mn-MN'); }
+function pct(v,t){ return t?Math.min(100,Math.round((v/t)*100)):0; }
+function getLifeScore(){
+  if(!D.kpis.length) return 0;
+  return Math.min(100,Math.round(D.kpis.reduce((s,k)=>s+pct(k.current,k.target),0)/D.kpis.length));
+}
+function updateTopScore(){
+  const s=getLifeScore();
+  document.getElementById('sidebarScore').textContent=s+'%';
+  document.getElementById('topScore').textContent='Score: '+s+'%';
+}
+
+// ============ DASHBOARD ============
+function renderDashboard(){
+  // Net Worth
+  const assets=(+v('assetCash'))+(+v('assetSave'))+(+v('assetCar'))+(+v('assetProperty'))+(+v('assetInvest'))+(+v('assetOther'));
+  const liabilities=(+v('liabilityLoan'))+(+v('liabilityCard'))+(+v('liabilityPersonal'))+(+v('liabilityOther'));
+  const nw=assets-liabilities;
+  document.getElementById('dashNW').textContent=(nw>=0?'':'-')+fmt(Math.abs(nw))+' ₮';
+  document.getElementById('dashNW').className='stat-val '+(nw>=0?'green':'red');
+  // Emergency
+  const exp=+v('monthlyExpense')||1050000, sav=+v('currentSavings')||0, tgt=parseInt(v_sel('emergencyTarget'))||6;
+  const epct=pct(sav,exp*tgt);
+  document.getElementById('dashEmergency').textContent=epct+'%';
+  // Week
+  document.getElementById('dashWeek').textContent=D.weekScore+'%';
+  document.getElementById('dashWeekGoal').textContent=D.weekGoal||'Зорилго тавьна уу';
+  // Invest
+  const totalInvest=D.investments.reduce((s,i)=>s+i.amount,0);
+  const avgROI=D.investments.length?D.investments.reduce((s,i)=>s+i.roi,0)/D.investments.length:0;
+  document.getElementById('dashInvest').textContent=fmt(totalInvest)+' ₮';
+  document.getElementById('dashROI').textContent=avgROI.toFixed(1);
+  // Tasks
+  const nextTasks=D.gtd.next.slice(0,4);
+  document.getElementById('dashTasks').innerHTML=nextTasks.length
+    ? nextTasks.map(t=>`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)"><i class="fas fa-circle-dot" style="color:var(--green);margin-right:6px;font-size:10px"></i>${t}</div>`).join('')
+    : '<span style="color:var(--text3);font-size:12px">GTD хэсэгт ажил нэмнэ үү</span>';
+  // Risks
+  const highRisks=D.risks.filter(r=>r.prob*r.impact>=40);
+  document.getElementById('dashRisks').innerHTML=highRisks.length
+    ? highRisks.map(r=>`<div style="padding:6px 0;font-size:12px;display:flex;align-items:center;gap:8px"><span class="risk-score high">${r.prob*r.impact}</span>${r.name}</div>`).join('')
+    : '<span style="color:var(--text3);font-size:12px">Өндөр эрсдэл бүртгэгдээгүй байна ✅</span>';
+  // Charts
+  renderParetoChart();
+  renderKpiChart();
+  updateTopScore();
+}
+
+function renderParetoChart(){
+  const job=+v('jobIncome')||1500000, free=+v('freeIncome')||0, biz=+v('bizIncome')||0, other=+v('otherIncome')||0;
+  const ctx=document.getElementById('chartPareto').getContext('2d');
+  if(charts.pareto) charts.pareto.destroy();
+  charts.pareto=new Chart(ctx,{
+    type:'bar',data:{labels:['Үндсэн ажил','Freelance','Бизнес','Бусад'],
+    datasets:[{data:[job,free,biz,other],backgroundColor:['#1f6feb','#3fb950','#d29922','#bc8cff'],borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8b949e',font:{size:11}}},y:{ticks:{color:'#8b949e',font:{size:11},callback:v=>(v/1000000).toFixed(1)+'M'}},}}
+  });
+}
+
+function renderKpiChart(){
+  if(!D.kpis.length) return;
+  const ctx=document.getElementById('chartKpi').getContext('2d');
+  if(charts.kpi) charts.kpi.destroy();
+  charts.kpi=new Chart(ctx,{
+    type:'radar',
+    data:{labels:D.kpis.map(k=>k.name),datasets:[{label:'Гүйцэтгэл',data:D.kpis.map(k=>pct(k.current,k.target)),backgroundColor:'rgba(88,166,255,0.15)',borderColor:'#58a6ff',pointBackgroundColor:'#58a6ff',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false,color:'#8b949e'},grid:{color:'rgba(139,148,158,0.2)'},pointLabels:{color:'#8b949e',font:{size:11}},min:0,max:100}},plugins:{legend:{display:false}}}
+  });
+}
+
+// ============ HELPERS ============
+function v(id){ const el=document.getElementById(id); return el?el.value:'0'; }
+function v_sel(id){ const el=document.getElementById(id); return el?el.value:'6'; }
+
+// ============ FINANCE — NEW ============
+
+// --- MoSCoW row helpers ---
+function addMoscowRow(cat){
+  const cont=document.getElementById(cat+'Items');
+  const row=document.createElement('div');
+  row.className='moscow-item'; row.dataset.cat=cat;
+  row.innerHTML=`<input type="text" placeholder="Зардлын нэр" class="moscow-name" style="width:55%"><input type="number" placeholder="₮" class="moscow-amt" style="width:35%;margin-left:6px"><button class="btn ghost sm moscow-del" style="margin-left:4px" onclick="this.parentElement.remove();calcMoscow()"><i class="fas fa-times" style="color:var(--red)"></i></button>`;
+  cont.appendChild(row);
+  row.querySelectorAll('input').forEach(i=>i.addEventListener('input',calcMoscow));
+}
+document.querySelectorAll('.moscow-del').forEach(b=>b.addEventListener('click',function(){this.parentElement.remove();calcMoscow();}));
+document.querySelectorAll('.moscow-item input').forEach(i=>i.addEventListener('input',calcMoscow));
+
+function getMoscowTotal(cat){
+  return Array.from(document.querySelectorAll(`#${cat}Items .moscow-amt`)).reduce((s,i)=>s+(+i.value||0),0);
+}
+
+function calcMoscow(){
+  const must=getMoscowTotal('must'), should=getMoscowTotal('should'), could=getMoscowTotal('could'), wont=getMoscowTotal('wont');
+  const income=+v('smartIncome')||1500000;
+  const total=must+should+could;
+  const balance=income-total;
+  document.getElementById('mustTotal').textContent=fmt(must)+' ₮';
+  document.getElementById('shouldTotal').textContent=fmt(should)+' ₮';
+  document.getElementById('couldTotal').textContent=fmt(could)+' ₮';
+  document.getElementById('wontTotal').textContent=fmt(wont)+' ₮';
+  document.getElementById('moscowGrandTotal').textContent=fmt(total)+' ₮';
+  const balEl=document.getElementById('moscowBalance');
+  balEl.textContent=(balance>=0?'':'-')+fmt(Math.abs(balance))+' ₮';
+  balEl.style.color=balance>=0?'var(--green)':'var(--red)';
+  // Update hidden inputs for backward compat
+  document.getElementById('mustCost').value=must;
+  document.getElementById('shouldCost').value=should;
+  document.getElementById('couldCost').value=could;
+  document.getElementById('wontCost').value=wont;
+  const rate=(total/income*100).toFixed(0);
+  document.getElementById('moscowSummary').innerHTML=`<div class="insight ${balance<0?'warn':balance<income*0.1?'':'success'}">
+    Орлого: <strong>${fmt(income)}₮</strong> &nbsp;|&nbsp; Нийт зардал: <strong>${fmt(total)}₮</strong> (${rate}%) &nbsp;|&nbsp; Үлдэгдэл: <strong style="color:${balance>=0?'var(--green)':'var(--red)'}">${fmt(balance)}₮</strong><br>
+    ${balance<0?'🚨 Зардал орлогоос <strong>'+ fmt(Math.abs(balance))+'₮</strong> их байна! Could/Won\'t зардлаа тэр дарааны танаарай.':balance<income*0.05?'⚠️ Үлдэгдэл маш бага байна. Хуримтлалд хэцүү.':'✅ Бюджет тэнцвэртэй байна. Үлдэгдлийг хуримтлалд чиглүүл.'}
+  </div>`;
+  calcRatios(); calc503020(); calcZBB(); calcCashFlow(); calcGoalProgress();
+}
+
+// --- Key Ratios ---
+function calcRatios(){
+  const income=+v('smartIncome')||1500000;
+  const saving=+v('monthlySaving')||0;
+  const debtPay=+v('monthlyDebt')||0;
+  const must=getMoscowTotal('must')||+v('mustCost')||800000;
+  const should=getMoscowTotal('should')||+v('shouldCost')||250000;
+  const could=getMoscowTotal('could')||+v('couldCost')||150000;
+  const totalExp=must+should+could;
+  const savRate=income>0?Math.round(saving/income*100):0;
+  const debtRatio=income>0?Math.round(debtPay/income*100):0;
+  const cashFlow=income-totalExp;
+  const spendRate=income>0?Math.round(totalExp/income*100):0;
+  document.getElementById('ratioSavings').textContent=savRate+'%';
+  document.getElementById('ratioSavings').style.color=savRate>=20?'var(--green)':savRate>=10?'var(--amber)':'var(--red)';
+  document.getElementById('ratioDebt').textContent=debtRatio+'%';
+  document.getElementById('ratioDebt').style.color=debtRatio<=20?'var(--green)':debtRatio<=36?'var(--amber)':'var(--red)';
+  document.getElementById('ratioCashflow').textContent=(cashFlow>=0?'':'-')+fmt(Math.abs(cashFlow))+' ₮';
+  document.getElementById('ratioCashflow').style.color=cashFlow>=0?'var(--green)':'var(--red)';
+  document.getElementById('ratioSpend').textContent=spendRate+'%';
+  document.getElementById('ratioSpend').style.color=spendRate<=70?'var(--green)':spendRate<=90?'var(--amber)':'var(--red)';
+  let tips=[];
+  if(savRate<20) tips.push('Хуримтлалын хувь <strong>'+savRate+'%</strong> байна — зорилт 20%+');
+  if(debtRatio>36) tips.push('Зээлийн дарамт <strong>'+debtRatio+'%</strong> — хэт өндөр, буулгах шаардлагатай');
+  if(cashFlow<0) tips.push('Сарын алдагдал: <strong>'+fmt(Math.abs(cashFlow))+'₮</strong> — яаралтай зардал тайрах хэрэгтэй');
+  document.getElementById('ratioInsight').innerHTML=tips.length?`<div class="insight warn" style="margin-top:8px">${tips.join('<br>')}</div>`:'<div class="insight success" style="margin-top:8px">✅ Санхүүгийн үзүүлэлтүүд хэвийн байна</div>';
+}
+
+// --- 50/30/20 ---
+function calc503020(){
+  const income=+v('smartIncome')||1500000;
+  const n50=income*0.5, n30=income*0.3, n20=income*0.2;
+  const must=getMoscowTotal('must')||+v('mustCost')||800000;
+  const could=getMoscowTotal('could')||+v('couldCost')||150000;
+  const saving=+v('monthlySaving')||0;
+  document.getElementById('r50val').textContent=fmt(n50)+' ₮';
+  document.getElementById('r30val').textContent=fmt(n30)+' ₮';
+  document.getElementById('r20val').textContent=fmt(n20)+' ₮';
+  document.getElementById('r50actual').textContent=fmt(must)+' ₮';
+  document.getElementById('r30actual').textContent=fmt(could)+' ₮';
+  document.getElementById('r20actual').textContent=fmt(saving)+' ₮';
+  document.getElementById('r50bar').style.width=Math.min(100,Math.round(must/n50*100))+'%';
+  document.getElementById('r30bar').style.width=Math.min(100,Math.round(could/n30*100))+'%';
+  document.getElementById('r20bar').style.width=Math.min(100,Math.round(saving/n20*100))+'%';
+  const ok50=must<=n50, ok30=could<=n30, ok20=saving>=n20;
+  const msgs=[];
+  if(!ok50) msgs.push('🏠 Хэрэгцээний зардал хэтэрсэн (+'+fmt(must-n50)+'₮)');
+  if(!ok30) msgs.push('🎯 Хүслийн зардал хэтэрсэн (+'+fmt(could-n30)+'₮)');
+  if(!ok20) msgs.push('💚 Хуримтлал дутмаг (-'+fmt(n20-saving)+'₮)');
+  document.getElementById('result503020').innerHTML=msgs.length?`<div class="insight warn" style="margin-top:8px">${msgs.join('<br>')}</div>`:'<div class="insight success" style="margin-top:8px">✅ 50/30/20 дүрэмд нийцэж байна!</div>';
+}
+
+// --- Zero-Based Budget ---
+function calcZBB(){
+  const income=+v('smartIncome')||1500000;
+  const must=getMoscowTotal('must')||+v('mustCost')||800000;
+  const should=getMoscowTotal('should')||+v('shouldCost')||250000;
+  const could=getMoscowTotal('could')||+v('couldCost')||150000;
+  const saving=+v('monthlySaving')||0;
+  const total=must+should+could+saving;
+  const remain=income-total;
+  document.getElementById('zbbIncome').textContent=fmt(income)+' ₮';
+  document.getElementById('zbbMust').textContent=fmt(must)+' ₮';
+  document.getElementById('zbbShould').textContent=fmt(should)+' ₮';
+  document.getElementById('zbbCould').textContent=fmt(could)+' ₮';
+  document.getElementById('zbbSav').textContent=fmt(saving)+' ₮';
+  document.getElementById('zbbFinal').textContent=(remain>=0?'':'-')+fmt(Math.abs(remain))+' ₮';
+  document.getElementById('zbbFinal').style.color=remain>=0?'var(--green)':'var(--red)';
+  document.getElementById('zbbRemain').textContent=(remain>=0?'':'-')+fmt(Math.abs(remain))+' ₮';
+  document.getElementById('zbbRemain').style.color=remain>=0?'var(--green)':'var(--red)';
+  document.getElementById('zbbStatus').textContent=remain===0?'✅ Тэнцвэртэй! Орлого = Зардал + Хуримтлал':remain>0?'👉 '+fmt(remain)+'₮ хуваарилагдаагүй байна — хуримтлалд нэм':remain<0?'🚨 '+fmt(Math.abs(remain))+'₮ дутагдал байна':'';
+}
+
+// --- FIRE ---
+function calcFIRE(){
+  const annual=+v('fireAnnual')||14400000;
+  const current=+v('fireCurrentSav')||0;
+  const monthly=+v('fireMonthly')||0;
+  const ret=(+v('fireReturn')||7)/100;
+  const age=+v('fireAge2')||28;
+  const fireNum=annual*25;
+  document.getElementById('fireNumber').textContent=fmt(fireNum)+' ₮';
+  if(monthly<=0){document.getElementById('fireYears').textContent='∞';return;}
+  const monthly_ret=ret/12;
+  let years=0, bal=current;
+  while(bal<fireNum && years<100){bal=bal*(1+monthly_ret)+monthly;years+=1/12;}
+  const yrs=Math.ceil(years);
+  document.getElementById('fireYears').textContent=yrs+' жил';
+  document.getElementById('fireAge').textContent=age+yrs+' насандаа санхүүгийн эрх чөлөөтэй болно';
+}
+
+// --- Cash Flow Forecast ---
+function calcCashFlow(){
+  const income=+v('smartIncome')||1500000;
+  const must=getMoscowTotal('must')||+v('mustCost')||800000;
+  const should=getMoscowTotal('should')||+v('shouldCost')||250000;
+  const could=getMoscowTotal('could')||+v('couldCost')||150000;
+  const totalExp=must+should+could;
+  const incGrow=(+v('cfGrowth')||0)/100;
+  const expGrow=(+v('cfExpGrowth')||0)/100;
+  const months=['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар'];
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="color:var(--text3);border-bottom:1px solid var(--border)">
+      <th style="padding:6px 8px;text-align:left">Сар</th>
+      <th style="padding:6px 8px;text-align:right">Орлого</th>
+      <th style="padding:6px 8px;text-align:right">Зардал</th>
+      <th style="padding:6px 8px;text-align:right">Cash Flow</th>
+      <th style="padding:6px 8px;text-align:right">Хуримтлагдсан</th>
+    </tr></thead><tbody>`;
+  let cumulative=0;
+  for(let i=0;i<6;i++){
+    const inc=income*Math.pow(1+incGrow,i);
+    const exp=totalExp*Math.pow(1+expGrow,i);
+    const cf=inc-exp;
+    cumulative+=cf;
+    html+=`<tr style="border-bottom:1px solid var(--border2)">
+      <td style="padding:6px 8px;color:var(--text2)">${months[i]}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--green)">${fmt(inc)}₮</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--red)">${fmt(exp)}₮</td>
+      <td style="padding:6px 8px;text-align:right;color:${cf>=0?'var(--green)':'var(--red)'};font-weight:600">${cf>=0?'+':''}${fmt(cf)}₮</td>
+      <td style="padding:6px 8px;text-align:right;font-family:'DM Mono',monospace;color:${cumulative>=0?'var(--accent)':'var(--red)'}">${fmt(cumulative)}₮</td>
+    </tr>`;
+  }
+  html+=`</tbody></table>`;
+  document.getElementById('cashFlowTable').innerHTML=html;
+}
+
+// --- Goal Progress ---
+function calcGoalProgress(){
+  const target=+v('goalSavTarget')||10000000;
+  const current=+v('goalSavCurrent')||0;
+  const p=Math.min(100,Math.round(current/target*100));
+  document.getElementById('goalFill').style.width=p+'%';
+  document.getElementById('goalProgressText').textContent=`${fmt(current)}₮ / ${fmt(target)}₮ — ${p}% (${fmt(target-current)}₮ үлдсэн)`;
+}
+
+// --- Pareto (income analysis) ---
+document.getElementById('calcPareto').addEventListener('click',()=>{
+  const job=+v('jobIncome'), free=+v('freeIncome'), biz=+v('bizIncome'), inv=+v('investIncome'), other=+v('otherIncome');
+  const total=job+free+biz+inv+other;
+  // Auto-sync smartIncome
+  if(total>0) document.getElementById('smartIncome').value=total;
+  if(!total){ document.getElementById('paretoResult').innerHTML='<div class="insight warn">Орлогын мэдээлэл оруулна уу</div>'; return; }
+  const items=[['Үндсэн ажил',job],['Freelance',free],['Бизнес',biz],['Хөрөнгийн өгөөш',inv],['Бусад',other]].filter(x=>x[1]>0);
+  const top=items.reduce((a,b)=>a[1]>b[1]?a:b);
+  const p=(top[1]/total*100).toFixed(0);
+  document.getElementById('paretoResult').innerHTML=`<div class="insight ${p>80?'warn':'success'}">Орлогын <strong>${p}%</strong> нь "${top[0]}"-с орж байна. ${p>80?'⚠️ Эрсдэл өндөр. 2+ эх үүсвэр хэрэгтэй.':'✅ Орлогын төрөлжилт сайн.'}</div>`;
+  renderParetoChart();
+  calcRatios(); calc503020(); calcZBB(); calcCashFlow();
+});
+
+// --- SMART goal ---
+document.getElementById('calcSmart').addEventListener('click',()=>{
+  const cur=+v('smartIncome'), tar=+v('smartTarget'), mon=+v('smartMonths');
+  const gap=tar-cur, monthly=Math.round(gap/mon);
+  const el=document.getElementById('smartResult');
+  if(gap<=0){ el.innerHTML='<div class="insight success">✅ Зорилтдоо хүрсэн байна! Дараагийн шатны зорилго тав.</div>'; return; }
+  el.innerHTML=`<div class="insight">📈 Сард <strong>${fmt(monthly)}₮</strong> нэмж орлогоо нэмэгдүүлэх шаардлагатай.<br>Нийт дутагдал: ${fmt(gap)}₮ — ${mon} сарын дотор.</div>`;
+});
+
+// Remove old budget button listener (now handled by calcMoscow)
+// Legacy backward compat — dummy listener
+if(document.getElementById('updateBudget')) document.getElementById('updateBudget').addEventListener('click',calcMoscow);
+
+// Init finance calcs
+setTimeout(()=>{ calcMoscow(); calcFIRE(); calcGoalProgress(); },100);
+
+// ============ JOURNAL ============
+let txFilter='all';
+function setTxFilter(f,el){
+  txFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderJournal();
+}
+
+// Set default date to today
+document.addEventListener('DOMContentLoaded',()=>{
+  const td=document.getElementById('txDate');
+  if(td) td.value=new Date().toISOString().split('T')[0];
+});
+if(document.getElementById('txDate')) document.getElementById('txDate').value=new Date().toISOString().split('T')[0];
+
+document.getElementById('addTx').addEventListener('click',()=>{
+  const desc=v('txDesc').trim(); if(!desc) return;
+  const amt=+v('txAmount'); if(!amt) return;
+  const tx={
+    id: Date.now(),
+    type: v('txType'),
+    desc: desc,
+    amount: amt,
+    cat: v('txCat'),
+    date: v('txDate')||new Date().toISOString().split('T')[0],
+    tag: v('txTag').trim()
+  };
+  if(!D.journal) D.journal=[];
+  D.journal.unshift(tx);
+  save();
+  document.getElementById('txDesc').value='';
+  document.getElementById('txAmount').value='';
+  document.getElementById('txTag').value='';
+  renderJournal();
+});
+
+function renderJournal(){
+  if(!D.journal) D.journal=[];
+  // Populate month filter
+  const monthSel=document.getElementById('txFilterMonth');
+  const months=[...new Set(D.journal.map(t=>t.date?t.date.substring(0,7):null).filter(Boolean))].sort().reverse();
+  const curMonth=monthSel.value;
+  monthSel.innerHTML='<option value="">Бүх сар</option>'+months.map(m=>`<option value="${m}" ${m===curMonth?'selected':''}>${m}</option>`).join('');
+
+  let items=D.journal;
+  if(curMonth) items=items.filter(t=>t.date&&t.date.startsWith(curMonth));
+  if(txFilter!=='all') items=items.filter(t=>t.type===txFilter);
+
+  const totalIncome=D.journal.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpense=D.journal.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const totalSaving=D.journal.filter(t=>t.type==='saving').reduce((s,t)=>s+t.amount,0);
+  const totalOpp=D.journal.filter(t=>t.type==='opportunity').reduce((s,t)=>s+t.amount,0);
+  const netFlow=totalIncome-totalExpense;
+  document.getElementById('jsTotalIncome').textContent=fmt(totalIncome)+' ₮';
+  document.getElementById('jsTotalExpense').textContent=fmt(totalExpense)+' ₮';
+  document.getElementById('jsTotalSaving').textContent=fmt(totalSaving)+' ₮';
+  document.getElementById('jsTotalOpp').textContent=fmt(totalOpp)+' ₮';
+  document.getElementById('jsNetFlow').textContent=(netFlow>=0?'+':'')+fmt(netFlow)+' ₮';
+  document.getElementById('jsNetFlow').style.color=netFlow>=0?'var(--green)':'var(--red)';
+
+  if(!items.length){
+    document.getElementById('txList').innerHTML='<div class="empty-journal"><i class="fas fa-book-open"></i>Бүртгэл байхгүй байна.<br>Дээрх маягтаар орлого, зардал, боломж бүрийг нэмнэ үү.</div>';
+    return;
+  }
+  const typeLabel={income:'💚 Орлого',expense:'🔴 Зардал',saving:'💙 Хуримтлал',opportunity:'🟣 Боломж'};
+  document.getElementById('txList').innerHTML=items.map(tx=>`
+    <div class="tx-row">
+      <div class="tx-type-dot ${tx.type}"></div>
+      <div class="tx-desc">
+        <div style="font-weight:500">${tx.desc}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${typeLabel[tx.type]||tx.type} · ${tx.cat||''}${tx.tag?' · <span style="color:var(--accent)">'+tx.tag+'</span>':''}</div>
+      </div>
+      <div class="tx-amount ${tx.type}">${tx.type==='expense'?'-':'+'} ${fmt(tx.amount)} ₮</div>
+      <div class="tx-meta">${tx.date||''}</div>
+      <button class="btn ghost sm" onclick="deleteTx(${tx.id})"><i class="fas fa-trash" style="color:var(--red);font-size:11px"></i></button>
+    </div>`).join('');
+}
+window.deleteTx=function(id){
+  D.journal=D.journal.filter(t=>t.id!==id);
+  save(); renderJournal();
+};
+
+
+
+// ============ NET WORTH ============
+document.getElementById('calcNetWorth').addEventListener('click',()=>{
+  const assets=(+v('assetCash'))+(+v('assetSave'))+(+v('assetCar'))+(+v('assetProperty'))+(+v('assetInvest'))+(+v('assetOther'));
+  const liabilities=(+v('liabilityLoan'))+(+v('liabilityCard'))+(+v('liabilityPersonal'))+(+v('liabilityOther'));
+  const nw=assets-liabilities;
+  const el=document.getElementById('nwValue');
+  el.textContent=(nw>=0?'':'-')+fmt(Math.abs(nw))+' ₮';
+  el.className='stat-val '+(nw>=0?'green':'red');
+  // Chart
+  const ctx=document.getElementById('chartNetWorth').getContext('2d');
+  if(charts.nw) charts.nw.destroy();
+  charts.nw=new Chart(ctx,{type:'doughnut',data:{labels:['Бэлэн мөнгө','Хадгаламж','Машин','Үл хөдлөх','Хөрөнгө оруулалт','Бусад'],
+    datasets:[{data:[+v('assetCash'),+v('assetSave'),+v('assetCar'),+v('assetProperty'),+v('assetInvest'),+v('assetOther')],backgroundColor:['#58a6ff','#3fb950','#d29922','#bc8cff','#39d353','#8b949e'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',font:{size:11},boxWidth:12}}}}
+  });
+  renderDashboard();
+});
+
+// ============ INVEST ============
+function renderInvest(){
+  document.getElementById('investList').innerHTML=D.investments.map((i,idx)=>`
+    <div class="inv-row">
+      <div class="inv-name">${i.name}<span style="font-size:10px;color:var(--text3);margin-left:6px">${i.sector||''}</span></div>
+      <div class="inv-amount">${fmt(i.amount)}₮</div>
+      <div class="inv-roi ${i.roi>=0?'pos':'neg'}">${i.roi>=0?'+':''}${i.roi}% ROI</div>
+      <button class="btn ghost sm" onclick="delInvest(${idx})"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+  const total=D.investments.reduce((s,i)=>s+i.amount,0);
+  const avgROI=D.investments.length?D.investments.reduce((s,i)=>s+i.roi,0)/D.investments.length:0;
+  document.getElementById('investTotal').innerHTML=`<div class="insight success">Нийт хөрөнгө оруулалт: <strong>${fmt(total)}₮</strong> | Дундаж ROI: <strong>${avgROI.toFixed(1)}%</strong><br>Жилийн хүлээгдэж буй өгөөж: <strong>${fmt(total*avgROI/100)}₮</strong></div>`;
+}
+window.delInvest=i=>{D.investments.splice(i,1);save();renderInvest();};
+document.getElementById('addInvest').addEventListener('click',()=>{
+  const n=v('investName');
+  if(!n){alert('Нэр оруулна уу');return;}
+  D.investments.push({name:n,amount:+v('investAmount')||0,roi:+v('investROI')||0,sector:v('investSector')});
+  save(); renderInvest();
+  document.getElementById('investName').value='';
+});
+
+// ============ EMERGENCY ============
+document.getElementById('updateEmergency').addEventListener('click',()=>{
+  const exp=+v('monthlyExpense'), sav=+v('currentSavings'), tgt=parseInt(v_sel('emergencyTarget'));
+  const need=exp*tgt, p=Math.min(100,pct(sav,need)), remain=Math.max(0,need-sav);
+  const months=exp>0?Math.floor(sav/exp):0;
+  document.getElementById('emergencyFillDetail').style.width=p+'%';
+  document.getElementById('emergencyPct').textContent=p+'%';
+  document.getElementById('emergencyMonths').textContent=months+' сарын нөөц';
+  document.getElementById('emergencyDetail').textContent=`Зорилт: ${tgt} сар (${fmt(need)}₮) | Одоо: ${fmt(sav)}₮`;
+  const insight=p>=100?'<div class="insight success">✅ Нөөц сан бэлэн байна! Дараагийн шатанд хөрөнгө оруулалтад шилжнэ үү.</div>'
+    :p>=50?`<div class="insight">📈 Сайн явна! Зорилтдоо хүрэхэд дутагдах ${fmt(remain)}₮. Сар бүр ${fmt(Math.round(remain/6))}₮ хадгалбал 6 сарын дотор хүрнэ.</div>`
+    :`<div class="insight warn">⚠️ Нөөц сан дутмаг байна. Сар бүр орлогоосоо 10-20% байгаа хадгалаарай. Одоогоор: ${fmt(sav)}₮</div>`;
+  document.getElementById('emergencyInsight').innerHTML=insight;
+  renderDashboard();
+});
+
+// ============ GTD ============
+function renderGTD(){
+  const cols=['inbox','next','waiting','someday'];
+  const icons={'inbox':'📌','next':'⚡','waiting':'⏳','someday':'💭'};
+  const moves={'inbox':['next','someday'],'next':['waiting','inbox'],'waiting':['next'],'someday':['next']};
+  cols.forEach(col=>{
+    document.getElementById('gtd'+cap(col)).innerHTML=D.gtd[col].map((t,i)=>{
+      const btns=(moves[col]||[]).map(to=>`<button class="btn ghost sm" onclick="moveGTD('${col}','${to}',${i})" title="${to}">→</button>`).join('');
+      return `<div class="gtd-item"><span class="gtd-item-text">${icons[col]} ${t}</span>${btns}<button class="btn ghost sm" onclick="delGTD('${col}',${i})"><i class="fas fa-times" style="color:var(--red)"></i></button></div>`;
+    }).join('');
+  });
+  document.getElementById('gtdInboxCount').textContent=D.gtd.inbox.length;
+}
+window.moveGTD=(from,to,i)=>{const item=D.gtd[from][i];D.gtd[from].splice(i,1);D.gtd[to].push(item);save();renderGTD();};
+window.delGTD=(col,i)=>{D.gtd[col].splice(i,1);save();renderGTD();};
+document.getElementById('addInbox').addEventListener('click',()=>{
+  const val=v('newInbox').trim(), prio=v('gtdPriority');
+  if(!val)return;
+  const col=prio==='someday'?'someday':'inbox';
+  D.gtd[col].push(val);save();renderGTD();
+  document.getElementById('newInbox').value='';
+});
+document.getElementById('newInbox').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('addInbox').click();});
+
+// ============ CRM ============
+function renderCRM(){
+  document.getElementById('crmList').innerHTML=D.crm.map((c,i)=>{
+    const initials=c.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const daysSince=c.lastMeet?Math.floor((new Date()-new Date(c.lastMeet))/(1000*60*60*24)):999;
+    const meetClass=daysSince>90?'red':daysSince>30?'amber':'green';
+    return `<div class="crm-card">
+      <div class="crm-avatar">${initials}</div>
+      <div class="crm-info">
+        <div class="crm-name">${c.name}</div>
+        <div class="crm-meta">${c.type}${c.phone?' · '+c.phone:''}</div>
+        <div class="crm-meta">🎂 ${c.birthday||'—'} · Сүүлд уулзсан: <span class="badge ${meetClass}">${daysSince<999?daysSince+' өдрийн өмнө':'—'}</span></div>
+      </div>
+      <button class="btn ghost sm" onclick="delCRM(${i})"><i class="fas fa-trash" style="color:var(--red)"></i></button>
+    </div>`;
+  }).join('');
+}
+window.delCRM=i=>{D.crm.splice(i,1);save();renderCRM();};
+document.getElementById('addCrm').addEventListener('click',()=>{
+  const n=v('crmName').trim();if(!n)return;
+  D.crm.push({name:n,type:v('crmType'),phone:v('crmPhone'),birthday:v('crmBirthday'),lastMeet:v('crmLastMeet')});
+  save();renderCRM();document.getElementById('crmName').value='';
+});
+
+// ============ VISION ============
+function renderVision(){
+  document.getElementById('visionList').innerHTML=D.vision.map((v,i)=>`
+    <div class="vision-card">
+      <img src="${v.url}" class="vision-img" onerror="this.src='https://picsum.photos/400/300?random=${i+10}'">
+      <div class="vision-title">${v.title}<br><span style="font-size:10px;color:var(--text3)">${v.cat||''} ${v.year?'· '+v.year:''}</span></div>
+      <button class="btn ghost sm" style="margin:0 10px 10px" onclick="delVision(${i})"><i class="fas fa-trash" style="color:var(--red)"></i></button>
+    </div>`).join('');
+}
+window.delVision=i=>{D.vision.splice(i,1);save();renderVision();};
+document.getElementById('addVision').addEventListener('click',()=>{
+  const t=v('visionTitle').trim();if(!t)return;
+  D.vision.push({title:t,url:v('visionUrl')||'https://picsum.photos/400/300?random='+Math.floor(Math.random()*100),cat:v('visionCat'),year:v('visionYear')});
+  save();renderVision();document.getElementById('visionTitle').value='';
+});
+
+// ============ KPI ============
+function renderKPI(){
+  document.getElementById('kpiList').innerHTML=D.kpis.map((k,i)=>{
+    const p=pct(k.current,k.target);
+    const cls=p>=80?'green':p>=50?'':'amber';
+    return `<div class="kpi-item">
+      <div class="kpi-header">
+        <div>
+          <div class="kpi-name">${k.name} <span style="font-size:11px;color:var(--text3)">${k.category||''}</span></div>
+          <div style="font-size:11px;color:var(--text3)">${fmt(k.current)} / ${fmt(k.target)} ${k.unit||''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="kpi-pct" style="color:${p>=80?'var(--green)':p>=50?'var(--accent)':'var(--amber)'}">${p}%</div>
+          <button class="btn ghost sm" onclick="delKPI(${i})"><i class="fas fa-trash" style="color:var(--red)"></i></button>
+        </div>
+      </div>
+      <div class="progress"><div class="progress-fill ${cls}" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+  updateTopScore();renderKpiChart();
+}
+window.delKPI=i=>{D.kpis.splice(i,1);save();renderKPI();};
+document.getElementById('addKpi').addEventListener('click',()=>{
+  const n=v('kpiName').trim();if(!n)return;
+  D.kpis.push({name:n,category:v('kpiCategory'),target:+v('kpiTarget')||100,current:+v('kpiCurrent')||0,unit:v('kpiUnit')});
+  save();renderKPI();document.getElementById('kpiName').value='';
+});
+
+// ============ RISK ============
+function renderRisk(){
+  document.getElementById('riskList').innerHTML=D.risks.map((r,i)=>{
+    const score=r.prob*r.impact;
+    const cls=score>=50?'high':score>=20?'med':'low';
+    return `<div class="risk-item">
+      <div>
+        <div style="font-size:13px;font-weight:500">${r.name} <span style="font-size:11px;color:var(--text3)">${r.category||''}</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">Магадлал: ${r.prob}/10 · Нөлөө: ${r.impact}/10</div>
+        ${r.mitigation?`<div style="font-size:11px;color:var(--green);margin-top:3px">🛡️ ${r.mitigation}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="risk-score ${cls}">Score: ${score}</span>
+        <button class="btn ghost sm" onclick="delRisk(${i})"><i class="fas fa-trash" style="color:var(--red)"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  const total=D.risks.reduce((s,r)=>s+r.prob*r.impact,0);
+  document.getElementById('riskAnalysis').innerHTML=D.risks.length
+    ?`<div class="insight ${total>100?'warn':'success'}">Нийт эрсдэлийн оноо: <strong>${total}</strong> · Өндөр эрсдэл (≥50): ${D.risks.filter(r=>r.prob*r.impact>=50).length} · ${total>100?'⚠️ Нийт эрсдэл өндөр байна. Стратеги хэрэгтэй.':'✅ Эрсдэл зохих түвшинд байна.'}</div>`:'';
+}
+window.delRisk=i=>{D.risks.splice(i,1);save();renderRisk();};
+document.getElementById('addRisk').addEventListener('click',()=>{
+  const n=v('riskName').trim();if(!n)return;
+  D.risks.push({name:n,category:v('riskCategory'),prob:+v('riskProb')||1,impact:+v('riskImpact')||1,mitigation:v('riskMitigation')});
+  save();renderRisk();document.getElementById('riskName').value='';
+});
+
+// ============ 12 WEEK YEAR ============
+function renderWeekYear(){
+  const score=D.weekScore||0;
+  // 12 week grid
+  const start=D.weekStart?new Date(D.weekStart):new Date();
+  const now=new Date();
+  let html='';
+  for(let i=0;i<12;i++){
+    const weekDate=new Date(start.getTime()+i*7*24*60*60*1000);
+    const isPast=weekDate<now, isNow=Math.abs(weekDate-now)<7*24*60*60*1000;
+    html+=`<div class="week-cell ${isPast&&!isNow?'done':''} ${isNow?'active':''}" title="Долоо хоног ${i+1}"></div>`;
+  }
+  document.getElementById('weekGrid').innerHTML=html;
+  document.getElementById('weekDisplay').innerHTML=`Зорилго: <strong>${D.weekGoal||'—'}</strong><br>Гүйцэтгэл: <strong>${score}%</strong><br>${score>=80?'🔥 Маш сайн явна!':score>=50?'💪 Тасралтгүй үргэлжлүүл':'⚡ Хурдасгах хэрэгтэй'}`;
+}
+document.getElementById('updateWeekScore').addEventListener('click',()=>{
+  D.weekGoal=v('weekGoal');D.weekScore=+v('weekScoreInput')||0;D.weekStart=v('weekStart');
+  save();renderWeekYear();renderDashboard();
+});
+
+// ============ CANVAS ============
+function saveCanvas(){
+  D.canvas={cs:v('canvas1'),vp:v('canvas2'),ch:v('canvas3'),cr:v('canvas4'),rev:v('canvas5'),kr:v('canvas6'),ka:v('canvas7'),kp:v('canvas8'),cost:v('canvas9')};
+  save(); alert('✅ Хадгалагдлаа');
+}
+function loadCanvas(){
+  const m={'canvas1':'cs','canvas2':'vp','canvas3':'ch','canvas4':'cr','canvas5':'rev','canvas6':'kr','canvas7':'ka','canvas8':'kp','canvas9':'cost'};
+  Object.entries(m).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=D.canvas[key]||'';});
+}
+document.getElementById('saveCanvas').addEventListener('click',saveCanvas);
+
+// ============ ANNUAL REVIEW ============
+function saveReview(){
+  D.annualReview={wins:v('reviewWins'),fails:v('reviewFails'),learn:v('reviewLearn'),next:v('reviewNext'),gratitude:v('reviewGratitude'),word:v('reviewWord')};
+  save(); alert('✅ Хадгалагдлаа');
+}
+function loadReview(){
+  const fields={reviewWins:'wins',reviewFails:'fails',reviewLearn:'learn',reviewNext:'next',reviewGratitude:'gratitude',reviewWord:'word'};
+  Object.entries(fields).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=D.annualReview[key]||'';});
+}
+document.getElementById('saveReview').addEventListener('click',saveReview);
+
+// ============ AI COACH ============
+function buildContext(){
+  const income=+v('smartIncome')||1500000;
+  const must=+v('mustCost')||800000;
+  const savings=+v('currentSavings')||0;
+  const nw=((+v('assetCash'))+(+v('assetSave'))+(+v('assetProperty')))-(+v('liabilityLoan'));
+  const lifeScore=getLifeScore();
+  const highRisks=D.risks.filter(r=>r.prob*r.impact>=40).map(r=>r.name).join(', ')||'байхгүй';
+  return `Хэрэглэгчийн Life OS өгөгдөл:
+- Сарын орлого: ${fmt(income)}₮
+- Зайлшгүй зардал (Must): ${fmt(must)}₮
+- Нөөц сан: ${fmt(savings)}₮
+- Net Worth: ${fmt(nw)}₮
+- Life Score: ${lifeScore}%
+- KPI-нууд: ${D.kpis.map(k=>`${k.name}: ${pct(k.current,k.target)}%`).join(', ')||'байхгүй'}
+- Өндөр эрсдэл: ${highRisks}
+- 12 Week зорилго: ${D.weekGoal||'тавигдаагүй'} (${D.weekScore}%)
+- Хөрөнгө оруулалт: ${D.investments.map(i=>i.name+'('+i.roi+'%ROI)').join(', ')||'байхгүй'}
+- Сүүлийн 10 гүйлгээ: ${(D.journal||[]).slice(0,10).map(t=>t.type+':'+t.desc+'('+t.amount+'₮)').join(', ')||'байхгүй'}`;
+}
+
+async function sendAI(userMsg){
+  const msgs=document.getElementById('aiMessages');
+  msgs.innerHTML+=`<div class="ai-msg user">${userMsg}</div>`;
+  const thinking=document.createElement('div');
+  thinking.className='ai-msg assistant thinking';
+  thinking.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  msgs.appendChild(thinking);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  try{
+    const context=buildContext();
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`Та Монгол хэлээр ярьдаг хувийн амьдралын зөвлөгч (Life Coach) болон санхүүгийн мэргэжлийн зөвлөгч юм. Хэрэглэгчийн Life OS өгөгдөлд үндэслэн практик, тодорхой зөвлөгөө өгнө. Товч, ойлгомжтой, урам зориг өгдөг хэлбэрээр хариулна. Emoji ашиглан хариулт сонирхолтой болго. Монгол мөнгөний нэгж: ₮ ашиглана.`,
+        messages:[{role:'user',content:`${context}\n\nАсуулт: ${userMsg}`}]
+      })
+    });
+    const data=await res.json();
+    thinking.remove();
+    const reply=data.content?.[0]?.text||'Уучлаарай, алдаа гарлаа.';
+    msgs.innerHTML+=`<div class="ai-msg assistant">${reply.replace(/\n/g,'<br>')}</div>`;
+    document.getElementById('dashAiTip').textContent=reply.substring(0,200)+'...';
+  }catch(e){
+    thinking.remove();
+    msgs.innerHTML+=`<div class="ai-msg assistant warn">⚠️ API холболт алдаатай байна. Сүлжээний холболтоо шалгаарай.</div>`;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+document.getElementById('aiSend').addEventListener('click',()=>{
+  const msg=v('aiInput').trim();if(!msg)return;
+  document.getElementById('aiInput').value='';
+  sendAI(msg);
+});
+document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('aiSend').click();});
+window.sendQuick=msg=>sendAI(msg);
+
+// ============ RENDER ALL ============
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+// ============ MOBILE NAV ============
+function navTo(page) {
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const pg = document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if(navItem) navItem.classList.add('active');
+  const pt = document.getElementById('pageTitle');
+  if(pt) {
+    const labels = {dashboard:'Dashboard',finance:'Санхүү',healthscore:'Санхүүгийн Оноо',ai:'AI Coach',emergency:'Нөөц сан',freedomday:'Эрх чөлөөний өдөр',dti:'DTI Харьцаа',billcalendar:'Төлбөрийн Календарь',sideincome:'Нэмэлт Орлого',networth:'Net Worth',invest:'Хөрөнгө',journal:'Дэвтэр',gtd:'GTD',kpi:'KPI',year12:'12 Week',risk:'Эрсдэл',crm:'CRM',vision:'Vision Board',business:'Business Canvas',review:'Жилийн үнэлгээ'};
+    pt.textContent = labels[page] || page;
+  }
+  // Update bottom nav active state
+  document.querySelectorAll('.bnav-item').forEach(b=>{
+    b.classList.toggle('active', b.dataset.page===page);
+  });
+  if(page==='dashboard') renderDashboard();
+  if(page==='healthscore') calcHealthScore();
+  if(page==='freedomday') calcFreedomDay();
+  if(page==='dti') calcDTI();
+  if(page==='billcalendar') renderBillCalendar();
+  if(page==='sideincome') calcSideIncome();
+}
+function toggleMoreMenu() {
+  const m = document.getElementById('bnavMoreMenu');
+  m.classList.toggle('open');
+  document.getElementById('bnavMore').classList.toggle('active', m.classList.contains('open'));
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#bnavMoreMenu') && !e.target.closest('#bnavMore')) {
+    document.getElementById('bnavMoreMenu').classList.remove('open');
+    document.getElementById('bnavMore').classList.remove('active');
+  }
+});
+
+// ============ FINANCIAL HEALTH SCORE ============
+function calcHealthScore() {
+  const income = +v('smartIncome')||1500000;
+  const saving = +v('monthlySaving')||0;
+  const debtPay = +v('monthlyDebt')||0;
+  const must = getMoscowTotal('must')||+v('mustCost')||800000;
+  const should = getMoscowTotal('should')||+v('shouldCost')||250000;
+  const could = getMoscowTotal('could')||+v('couldCost')||150000;
+  const totalExp = must+should+could;
+  const assets = (+v('assetCash'))+(+v('assetSave'))+(+v('assetCar'))+(+v('assetProperty'))+(+v('assetInvest'))+(+v('assetOther'));
+  const liabilities = (+v('liabilityLoan'))+(+v('liabilityCard'))+(+v('liabilityPersonal'))+(+v('liabilityOther'));
+  const emergSav = +v('currentSavings')||0;
+  const monthlyExp = +v('monthlyExpense')||1050000;
+  const emergTarget = parseInt(v_sel('emergencyTarget'))||6;
+
+  const criteria = [];
+  let totalScore = 0;
+
+  // 1. Savings rate (max 20)
+  const savRate = income>0 ? saving/income*100 : 0;
+  const s1 = savRate>=20?20:savRate>=10?12:savRate>=5?6:0;
+  criteria.push({name:'Хадгаламжийн хувь', val:Math.round(savRate)+'%', max:20, score:s1, good:savRate>=20, hint:'Зорилт: орлогын ≥20%'});
+  totalScore += s1;
+
+  // 2. Emergency fund (max 20)
+  const emMonths = monthlyExp>0 ? emergSav/monthlyExp : 0;
+  const s2 = emMonths>=6?20:emMonths>=3?12:emMonths>=1?6:0;
+  criteria.push({name:'Нөөц сан', val:emMonths.toFixed(1)+' сар', max:20, score:s2, good:emMonths>=6, hint:'Зорилт: ≥6 сарын зардал'});
+  totalScore += s2;
+
+  // 3. DTI (max 20)
+  const dti = income>0 ? debtPay/income*100 : 0;
+  const s3 = dti<=10?20:dti<=20?16:dti<=36?10:dti<=43?4:0;
+  criteria.push({name:'Өрийн харьцаа (DTI)', val:Math.round(dti)+'%', max:20, score:s3, good:dti<=20, hint:'Аюулгүй: ≤20%'});
+  totalScore += s3;
+
+  // 4. Net worth positive (max 15)
+  const nw = assets - liabilities;
+  const s4 = nw>income*6?15:nw>income?10:nw>0?6:0;
+  criteria.push({name:'Net Worth', val:(nw>=0?'+':'')+fmt(nw)+'₮', max:15, score:s4, good:nw>0, hint:'Зорилт: эерэг, 6 сарын орлогоос дээш'});
+  totalScore += s4;
+
+  // 5. Expense control (max 15)
+  const spendRate = income>0 ? totalExp/income*100 : 100;
+  const s5 = spendRate<=60?15:spendRate<=70?12:spendRate<=85?7:spendRate<=100?3:0;
+  criteria.push({name:'Зардлын хяналт', val:Math.round(spendRate)+'%', max:15, score:s5, good:spendRate<=70, hint:'Зорилт: орлогын ≤70%'});
+  totalScore += s5;
+
+  // 6. Cash flow positive (max 10)
+  const cf = income - totalExp;
+  const s6 = cf>income*0.2?10:cf>0?6:0;
+  criteria.push({name:'Мөнгөн урсгал', val:(cf>=0?'+':'')+fmt(cf)+'₮', max:10, score:s6, good:cf>0, hint:'Зорилт: эерэг'});
+  totalScore += s6;
+
+  // Display score
+  const circle = document.getElementById('healthScoreCircle');
+  const scoreEl = document.getElementById('healthScoreVal');
+  const gradeEl = document.getElementById('healthScoreGrade');
+  const msgEl = document.getElementById('healthScoreMsg');
+  scoreEl.textContent = totalScore;
+  let grade, color, msg;
+  if(totalScore>=85){grade='🏆 Шилдэг';color='var(--green)';msg='Санхүүгийн байдал маш сайн байна. Хөрөнгө оруулалтаа нэмэгдүүл!';}
+  else if(totalScore>=70){grade='✅ Сайн';color='var(--accent)';msg='Сайн байна! Хадгаламжаа нэмэгдүүлэх боломж байна.';}
+  else if(totalScore>=50){grade='⚠️ Дунд';color='var(--amber)';msg='Хэд хэдэн зүйлд анхаарал хандуулах шаардлагатай.';}
+  else if(totalScore>=30){grade='🔴 Муу';color='var(--red)';msg='Санхүүгийн байдал эрсдэлтэй. Яаралтай арга хэмжээ авна уу.';}
+  else{grade='💀 Хямрал';color='var(--red)';msg='Санхүүгийн хямрал. Нэн даруй зардлаа хянаж нөөц байгуул.';}
+  scoreEl.style.color = color;
+  gradeEl.textContent = grade;
+  gradeEl.style.color = color;
+  msgEl.textContent = msg;
+  circle.style.borderColor = color;
+
+  // Criteria list
+  const cEl = document.getElementById('healthCriteria');
+  cEl.innerHTML = criteria.map(c=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span>${c.good?'✅':'❌'} ${c.name}</span>
+        <span style="font-weight:600;color:${c.good?'var(--green)':'var(--amber)'}">${c.val}</span>
+      </div>
+      <div class="progress"><div class="progress-fill ${c.good?'green':'amber'}" style="width:${Math.round(c.score/c.max*100)}%"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">${c.score}/${c.max} оноо · ${c.hint}</div>
+    </div>`).join('');
+
+  // Advice
+  const bad = criteria.filter(c=>!c.good);
+  document.getElementById('healthAdvice').innerHTML = bad.length?
+    bad.map(c=>`<div style="margin-bottom:8px;padding:8px;background:rgba(248,81,73,0.07);border-radius:6px;border-left:3px solid var(--red)">
+      <strong>${c.name}</strong><br>${c.hint}</div>`).join('')
+    :'<div class="insight success">🎉 Бүх шалгуурыг хангаж байна!</div>';
+
+  // Radar chart
+  if(charts.health) charts.health.destroy();
+  const ctx = document.getElementById('chartHealth');
+  if(ctx) charts.health = new Chart(ctx.getContext('2d'),{
+    type:'radar',
+    data:{labels:criteria.map(c=>c.name.substring(0,10)),datasets:[{label:'Оноо',data:criteria.map(c=>Math.round(c.score/c.max*100)),backgroundColor:'rgba(88,166,255,0.15)',borderColor:'var(--accent)',pointBackgroundColor:'var(--accent)'}]},
+    options:{scales:{r:{ticks:{display:false},grid:{color:'rgba(255,255,255,0.1)'},pointLabels:{color:'#8b949e',font:{size:10}},min:0,max:100}},plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// ============ FREEDOM DAY ============
+function calcFreedomDay() {
+  const annual = +document.getElementById('fdAnnualIncome').value||18000000;
+  const tax = +document.getElementById('fdTax').value||0;
+  const expenses = +document.getElementById('fdExpenses').value||0;
+  const savings = +document.getElementById('fdSavings').value||0;
+  const totalBurden = tax + expenses;
+  const freedomDayNum = Math.ceil(totalBurden/annual*365);
+  const fd = document.getElementById('freedomDate');
+  const fdn = document.getElementById('freedomDayNum');
+  if(freedomDayNum<=365) {
+    const d = new Date(new Date().getFullYear(),0,1);
+    d.setDate(d.getDate()+freedomDayNum-1);
+    fd.textContent = (d.getMonth()+1)+'р сарын '+d.getDate()+'ний өдөр';
+    fdn.textContent = 'Жилийн '+freedomDayNum+' дэх өдөр';
+  } else {
+    fd.textContent = 'Жилд хүрэхгүй!';
+    fdn.textContent = 'Зардал орлогоос их байна';
+  }
+  const taxPct = annual>0?Math.round(tax/annual*100):0;
+  const expPct = annual>0?Math.round(expenses/annual*100):0;
+  const savPct = annual>0?Math.round(savings/annual*100):0;
+  const freePct = Math.max(0,100-taxPct-expPct);
+  document.getElementById('freedomTimeline').innerHTML = `
+    <div style="display:flex;height:28px;border-radius:8px;overflow:hidden;margin-bottom:8px">
+      <div style="width:${taxPct}%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:10px;color:white;min-width:${taxPct>5?'auto':'0'}">${taxPct>5?taxPct+'%':''}</div>
+      <div style="width:${expPct}%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:10px;color:white;min-width:${expPct>5?'auto':'0'}">${expPct>5?expPct+'%':''}</div>
+      <div style="width:${freePct}%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;color:white;flex:1">${freePct>5?freePct+'%':''}</div>
+    </div>
+    <div style="display:flex;gap:16px;font-size:11px;color:var(--text3)">
+      <span><span style="color:var(--red)">■</span> Татвар ${taxPct}%</span>
+      <span><span style="color:var(--amber)">■</span> Зардал ${expPct}%</span>
+      <span><span style="color:var(--green)">■</span> Чөлөөт ${freePct}%</span>
+    </div>`;
+  document.getElementById('freedomInsight').innerHTML = freePct>=30?
+    `<div class="insight success">✅ Таны орлогын <strong>${freePct}%</strong> чөлөөт хугацаанд ажиллаж байна!</div>`:
+    `<div class="insight warn">⚠️ Орлогын зөвхөн <strong>${freePct}%</strong> чөлөөт. Зардлаа бууруул!</div>`;
+  if(charts.fd) charts.fd.destroy();
+  const ctx = document.getElementById('chartFreedomDay');
+  if(ctx) charts.fd = new Chart(ctx.getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['Татвар','Зардал','Хадгаламж','Чөлөөт'],datasets:[{data:[taxPct,expPct-savPct,savPct,freePct],backgroundColor:['rgba(248,81,73,0.8)','rgba(210,153,34,0.8)','rgba(88,166,255,0.8)','rgba(63,185,80,0.8)']}]},
+    options:{plugins:{legend:{labels:{color:'#8b949e',font:{size:11}}}},responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// ============ DTI ============
+function addDTIRow() {
+  const div = document.createElement('div');
+  div.className='dti-item';
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px';
+  div.innerHTML=`<input type="text" placeholder="Зээлийн нэр" class="dti-name" style="flex:1"><input type="number" placeholder="₮" class="dti-amt" style="width:120px"><button class="btn ghost sm" onclick="this.parentElement.remove();calcDTI()"><i class="fas fa-times" style="color:var(--red)"></i></button>`;
+  document.getElementById('dtiItems').appendChild(div);
+  div.querySelector('.dti-amt').addEventListener('input',calcDTI);
+}
+function calcDTI() {
+  const income = +document.getElementById('dtiIncome').value||1500000;
+  let total = 0;
+  document.querySelectorAll('.dti-amt').forEach(i=>total+=(+i.value||0));
+  const dti = income>0?Math.round(total/income*100):0;
+  const el = document.getElementById('dtiValue');
+  el.textContent = dti+'%';
+  let color='var(--green)',status='',advice='';
+  if(dti<=20){color='var(--green)';status='✅ Маш сайн';}
+  else if(dti<=36){color='var(--accent)';status='🟡 Хэвийн';}
+  else if(dti<=43){color='var(--amber)';status='⚠️ Анхааруулга';}
+  else{color='var(--red)';status='🚨 Аюулгүй бус';}
+  el.style.color=color;
+  document.getElementById('dtiStatus').textContent=status;
+  document.getElementById('dtiStatus').style.color=color;
+  document.getElementById('dtiNeedle').style.left=Math.min(95,dti/50*100)+'%';
+  document.getElementById('dtiDetail').innerHTML=`Нийт зээлийн төлбөр: <strong>${fmt(total)}₮/сар</strong> · Орлого: <strong>${fmt(income)}₮</strong>`;
+  if(dti>36) document.getElementById('dtiAdvice').innerHTML=`<div class="insight warn">⚠️ DTI ${dti}% байна. Зорилт ≤36%. <strong>${fmt(Math.max(0,total-income*0.36))}₮</strong>-ийн төлбөр бууруулах шаардлагатай.</div>`;
+  else document.getElementById('dtiAdvice').innerHTML=`<div class="insight success">✅ DTI ${dti}% — аюулгүй хязгаарт байна.</div>`;
+  if(charts.dti) charts.dti.destroy();
+  const ctx = document.getElementById('chartDTI');
+  if(ctx) charts.dti = new Chart(ctx.getContext('2d'),{
+    type:'bar',
+    data:{labels:['Зээлийн төлбөр','Чөлөөт орлого'],datasets:[{data:[total,Math.max(0,income-total)],backgroundColor:['rgba(248,81,73,0.7)','rgba(63,185,80,0.7)']}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#8b949e',callback:v=>fmt(v)+'₮'},grid:{color:'rgba(255,255,255,0.05)'}},x:{ticks:{color:'#8b949e'}}},responsive:true,maintainAspectRatio:false}
+  });
+}
+
+// ============ BILL CALENDAR ============
+if(!D.bills) D.bills=[];
+function addBillRow() {
+  document.getElementById('billAddForm').style.display='flex';
+  document.getElementById('billName').value='';
+  document.getElementById('billAmt').value='';
+  document.getElementById('billDay').value='';
+}
+function saveBill() {
+  const name=document.getElementById('billName').value.trim();
+  const amt=+document.getElementById('billAmt').value||0;
+  const day=+document.getElementById('billDay').value||1;
+  const cat=document.getElementById('billCat').value;
+  if(!name||!amt){alert('Нэр болон дүн оруулна уу');return;}
+  D.bills.push({name,amt,day,cat});save();
+  document.getElementById('billAddForm').style.display='none';
+  renderBillCalendar();
+}
+function renderBillCalendar() {
+  if(!D.bills) D.bills=[];
+  const itemsEl = document.getElementById('billItems');
+  if(!D.bills.length){itemsEl.innerHTML='<div style="text-align:center;padding:24px;color:var(--text3)">Төлбөр нэмэгдээгүй байна</div>';return;}
+  const sorted=[...D.bills].sort((a,b)=>a.day-b.day);
+  itemsEl.innerHTML=sorted.map((b,i)=>{
+    const catIcons={housing:'🏠',utilities:'💡',loan:'💳',subscription:'📱',insurance:'🛡️',other:'📦'};
+    return `<div class="tx-row">
+      <div class="tx-type-dot expense"></div>
+      <div style="width:30px;text-align:center;font-size:14px;font-weight:700;color:var(--accent)">${b.day}</div>
+      <div class="tx-desc">${catIcons[b.cat]||'📦'} ${b.name}</div>
+      <div class="tx-amount expense">${fmt(b.amt)}₮</div>
+      <button class="btn ghost sm" onclick="D.bills.splice(${i},1);save();renderBillCalendar()"><i class="fas fa-trash" style="color:var(--red)"></i></button>
+    </div>`;
+  }).join('');
+  // Mini calendar
+  const today=new Date();
+  const year=today.getFullYear(),month=today.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const dayNames=['Ня','Да','Мя','Лх','Пү','Ба','Бя'];
+  let cal=dayNames.map(d=>`<div style="font-weight:600;color:var(--text3);padding:4px 0">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) cal+=`<div></div>`;
+  const billDays=new Set(D.bills.map(b=>b.day));
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===today.getDate();
+    const hasBill=billDays.has(d);
+    const billAmt=D.bills.filter(b=>b.day===d).reduce((s,b)=>s+b.amt,0);
+    cal+=`<div style="padding:3px 1px;border-radius:4px;font-size:10px;cursor:${hasBill?'pointer':'default'};${isToday?'background:rgba(88,166,255,0.2);font-weight:700':''}${hasBill?';background:rgba(248,81,73,0.15);border:1px solid rgba(248,81,73,0.3)':''}" title="${hasBill?fmt(billAmt)+'₮':''}">${d}${hasBill?'<div style="font-size:8px;color:var(--red)">●</div>':''}</div>`;
+  }
+  document.getElementById('billCalendarGrid').innerHTML=cal;
+  // Totals
+  const total=D.bills.reduce((s,b)=>s+b.amt,0);
+  document.getElementById('billTotal').textContent=fmt(total)+'₮';
+  const catTotals={};
+  D.bills.forEach(b=>{catTotals[b.cat]=(catTotals[b.cat]||0)+b.amt;});
+  const catNames={housing:'🏠 Орон сууц',utilities:'💡 Коммунал',loan:'💳 Зээл',subscription:'📱 Захиалга',insurance:'🛡️ Даатгал',other:'📦 Бусад'};
+  document.getElementById('billCatBreakdown').innerHTML=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
+      <span>${catNames[k]||k}</span>
+      <span style="font-weight:600;color:var(--red)">${fmt(v)}₮ <span style="color:var(--text3);font-size:11px">(${Math.round(v/total*100)}%)</span></span>
+    </div>
+    <div class="progress" style="margin-bottom:8px"><div class="progress-fill red" style="width:${Math.round(v/total*100)}%"></div></div>
+  `).join('');
+}
+
+// ============ SIDE INCOME ============
+if(!D.sideIncomes) D.sideIncomes=[];
+function addSideIncomeRow() {
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px;background:var(--bg3);padding:10px;border-radius:8px;align-items:center;flex-wrap:wrap';
+  div.innerHTML=`
+    <input type="text" placeholder="Нэр (Freelance, Түрээс...)" style="flex:1;min-width:150px">
+    <input type="number" placeholder="Орлого ₮/сар" style="width:140px">
+    <input type="number" placeholder="Цаг/сар" style="width:100px">
+    <select style="width:120px">
+      <option>Freelance</option><option>Бизнес</option><option>Хөрөнгө</option><option>Захиалга</option><option>Консультант</option><option>Бусад</option>
+    </select>
+    <button class="btn ghost sm" onclick="this.closest('div').remove();calcSideIncome()"><i class="fas fa-times" style="color:var(--red)"></i></button>`;
+  div.querySelectorAll('input').forEach(i=>i.addEventListener('input',calcSideIncome));
+  document.getElementById('sideIncomeItems').appendChild(div);
+  calcSideIncome();
+}
+function calcSideIncome() {
+  const mainIncome=+document.getElementById('siMainIncome').value||1500000;
+  const target=+document.getElementById('siTarget').value||500000;
+  let total=0;const items=[];
+  document.querySelectorAll('#sideIncomeItems > div').forEach(div=>{
+    const inputs=div.querySelectorAll('input');
+    const name=inputs[0]?.value||'—';
+    const amt=+inputs[1]?.value||0;
+    if(amt>0){total+=amt;items.push({name,amt});}
+  });
+  document.getElementById('siTotal').textContent=fmt(total)+'₮';
+  document.getElementById('siTargetShow').textContent=fmt(target)+'₮';
+  const combined=mainIncome+total;
+  document.getElementById('siCombined').textContent=fmt(combined)+'₮';
+  const addPct=mainIncome>0?Math.round(total/mainIncome*100):0;
+  document.getElementById('siPercent').textContent=addPct;
+  const prog=target>0?Math.min(100,Math.round(total/target*100)):0;
+  document.getElementById('siProgress').textContent=prog+'%';
+  document.getElementById('siProgressBar').style.width=prog+'%';
+  if(charts.si) charts.si.destroy();
+  const ctx=document.getElementById('chartSideIncome');
+  if(ctx) charts.si=new Chart(ctx.getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['Үндсэн орлого',...items.map(i=>i.name)],datasets:[{data:[mainIncome,...items.map(i=>i.amt)],backgroundColor:['rgba(88,166,255,0.8)','rgba(63,185,80,0.8)','rgba(210,153,34,0.8)','rgba(188,140,255,0.8)','rgba(248,81,73,0.8)']}]},
+    options:{plugins:{legend:{labels:{color:'#8b949e',font:{size:11}}}},responsive:true,maintainAspectRatio:false}
+  });
+}
+
+function renderAll(){
+  if(!D.bills) D.bills=[];
+  if(!D.sideIncomes) D.sideIncomes=[];
+  renderGTD();renderCRM();renderVision();renderInvest();renderKPI();renderRisk();loadCanvas();loadReview();renderWeekYear();
+  document.getElementById('weekGoal').value=D.weekGoal||'';
+  document.getElementById('weekScoreInput').value=D.weekScore||0;
+  renderJournal();
+  setTimeout(()=>{ calcMoscow(); calcFIRE(); calcGoalProgress(); calcCashFlow(); },150);
+  renderDashboard();
+}
+load();
+</script>
+<!-- PWA Install Banner -->
+<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1f6feb,#8957e5);padding:14px 20px;z-index:10000;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.4)">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">⬡</div>
+    <div>
+      <div style="font-size:13px;font-weight:600;color:white">Life OS Pro суулгах</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.75)">Нүүр дэлгэцэд нэмж офлайн ашиглах</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button onclick="installPWA()" style="background:white;color:#1f6feb;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Суулгах</button>
+    <button onclick="document.getElementById('pwaInstallBanner').style.display='none'" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:8px 10px;cursor:pointer"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<!-- iOS install hint (Safari) -->
+<div id="iosHint" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1c2128;border-top:1px solid #30363d;padding:16px 20px;z-index:9999;text-align:center">
+  <div style="font-size:13px;color:#e6edf3;margin-bottom:6px">📱 <strong>iPhone/iPad дээр суулгах:</strong></div>
+  <div style="font-size:12px;color:#8b949e">Safari дээр нээж &nbsp;<span style="background:#30363d;padding:2px 8px;border-radius:4px">⎋ Share</span>&nbsp; → &nbsp;<span style="background:#30363d;padding:2px 8px;border-radius:4px">Add to Home Screen</span></div>
+  <button onclick="document.getElementById('iosHint').style.display='none'" style="margin-top:10px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:6px;padding:5px 16px;cursor:pointer;font-size:12px">Хаах</button>
+</div>
+
+<script>
+// ====== SERVICE WORKER ======
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+
+// ====== PWA INSTALL ======
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwaInstallBanner').style.display = 'flex';
+});
+window.installPWA = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwaInstallBanner').style.display = 'none';
+};
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwaInstallBanner').style.display = 'none';
+});
+
+// iOS Safari detection — show manual hint
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+const isSafari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent);
+if (isIOS && !isStandalone && isSafari) {
+  setTimeout(() => { document.getElementById('iosHint').style.display = 'block'; }, 2500);
+}
+</script>
+</body>
+</html>
